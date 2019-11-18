@@ -10,7 +10,13 @@ import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import android.app.AlertDialog;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,20 +26,12 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Toast;
-
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.Volley;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -61,6 +59,11 @@ public class MainActivity extends AppCompatActivity {
     private int dotsCount=5;    //No of tabs or images
     private ImageView[] dots;
     LinearLayout linearLayout;
+
+    private static final int TRIGGER_AUTO_COMPLETE = 100;
+    private static final long AUTO_COMPLETE_DELAY = 300;
+    private Handler handler;
+    private AutoSuggestAdapter autoSuggestAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +94,10 @@ public class MainActivity extends AppCompatActivity {
             public void onPageScrollStateChanged(int state) {
             }
         });
+
+        // 4) Autocomplete Setting up the adapter for AutoSuggest
+        autoSuggestAdapter = new AutoSuggestAdapter(this,
+                android.R.layout.simple_dropdown_item_1line);
     }
 
 
@@ -124,7 +131,6 @@ public class MainActivity extends AppCompatActivity {
                 fragobj.setArguments(bundle);
                 screen_fragments.add(fragobj);
             }
-//            List<Fragment> screen_fragments = new ArrayList<>();
         }
 
         @Override
@@ -165,6 +171,40 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void makeApiCall(String text) {
+        ApiCall.make(this, text, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                //parsing logic, please change it as per your requirement
+                Log.d("Json Response", response.toString());
+                List<String> stringList = new ArrayList<>();
+                try {
+
+                    for(int i = 0; i < response.length(); i++) {
+                        try {
+                            stringList.add(response.getString(i));
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    autoSuggestAdapter.setData(stringList);
+                    autoSuggestAdapter.notifyDataSetChanged();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                //IMPORTANT: set data here and notify
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+            }
+        });
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the search menu action bar.
@@ -178,39 +218,60 @@ public class MainActivity extends AppCompatActivity {
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchMenu);
 
         // Get SearchView autocomplete object.
-        searchAutoComplete = (SearchView.SearchAutoComplete)searchView.findViewById(R.id.search_src_text);
-        searchAutoComplete.setBackgroundColor(getResources().getColor(R.color.colorVeryDarkGrey));
-        searchAutoComplete.setTextColor(getResources().getColor(R.color.colorWhite));
+        final SearchView.SearchAutoComplete searchAutoComplete = (SearchView.SearchAutoComplete)searchView.findViewById(R.id.search_src_text);
+        searchAutoComplete.setBackgroundColor(Color.BLUE);
+        searchAutoComplete.setTextColor(Color.GREEN);
         searchAutoComplete.setDropDownBackgroundResource(android.R.color.white);
         searchAutoComplete.setThreshold(1);
-        // Listen to search view item on click event.
+        searchAutoComplete.setAdapter(autoSuggestAdapter);
+
+        searchAutoComplete.setOnItemClickListener(
+                new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view,
+                                            int position, long id) {
+
+                        Log.d("Item Click", autoSuggestAdapter.getObject(position));
+                        searchAutoComplete.setText(autoSuggestAdapter.getObject(position));
+                    }
+                });
+
+
         searchAutoComplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int itemIndex, long id) {
-                String queryString=(String)adapterView.getItemAtPosition(itemIndex);
+                String queryString= (String) adapterView.getItemAtPosition(itemIndex);
                 Log.d("ITEMCLICK",queryString);
                 searchAutoComplete.setText("" + queryString);
-                Toast.makeText(MainActivity.this, "you clicked " + queryString, Toast.LENGTH_LONG).show();
+
             }
         });
 
-        // Below event is triggered when submit search query.
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        searchAutoComplete.addTextChangedListener(new TextWatcher() {
             @Override
-            public boolean onQueryTextSubmit(String query) {
-                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-                alertDialog.setMessage("Search keyword is " + query);
-                alertDialog.show();
-                return false;
+            public void beforeTextChanged(CharSequence s, int start, int
+                    count, int after) {
             }
-
             @Override
-            public boolean onQueryTextChange(String newText) {
-                Log.d("QUERY CHANGE", newText);
-                retrieveData(newText);
-                Log.d("QUERY CHANGE", Arrays.toString(dataArr));
+            public void onTextChanged(CharSequence s, int start, int before,
+                                      int count) {
+                handler.removeMessages(TRIGGER_AUTO_COMPLETE);
+                handler.sendEmptyMessageDelayed(TRIGGER_AUTO_COMPLETE,
+                        AUTO_COMPLETE_DELAY);
+            }
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
 
-                searchAutoComplete.showDropDown();
+        handler = new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(Message msg) {
+                if (msg.what == TRIGGER_AUTO_COMPLETE) {
+                    if (!TextUtils.isEmpty(searchAutoComplete.getText())) {
+                        makeApiCall(searchAutoComplete.getText().toString());
+                    }
+                }
                 return false;
             }
         });
@@ -218,59 +279,4 @@ public class MainActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    private void retrieveData(String s)
-    {
-        // 1) Make an API call
-        RequestQueue queue = Volley.newRequestQueue(this);
-        String url ="https://weather-node-app-259004.appspot.com/getAutocompleteSuggestion/" + s;
-
-        JsonArrayRequest jsonObjectRequest = new JsonArrayRequest
-                (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
-
-                    @Override
-                    public void onResponse(JSONArray response) {
-
-                        dataArr = new String[response.length()];
-                        List<String> suggestions = new ArrayList<String>();
-                        for(int i = 0; i < response.length(); i++) {
-                            try {
-                                suggestions.add(response.getString(i));
-                                dataArr[i] = response.getString(i);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        for(int j = 0; j < response.length(); j++){
-                            Log.d("ARR VAL", dataArr[j]);
-                        }
-
-                        ArrayAdapter<String> locationAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_dropdown_item_1line, suggestions);
-                        searchAutoComplete.setAdapter(locationAdapter);
-                        Log.d("VOLLEY RESPONSE ", response.toString());
-                        Log.d("VOLLEY RESPONSE ", dataArr.toString());
-
-                    }
-                }, new Response.ErrorListener() {
-
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // TODO: Handle error
-                        Log.d("VOLLEY error ", error.toString());
-                    }
-                });
-
-        queue.add(jsonObjectRequest);
-
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        switch (item.getItemId()) {
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
 }
