@@ -37,14 +37,7 @@ public class ApiCall {
     public <T> void addToRequestQueue(Request<T> req) {
         getRequestQueue().add(req);
     }
-//    public static void make(Context ctx, String query, Response.Listener<String>
-//            listener, Response.ErrorListener errorListener) {
-//        String url = "https://itunes.apple.com/search?term=" + query
-//                + "&country=US";
-//        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-//                listener, errorListener);
-//        ApiCall.getInstance(ctx).addToRequestQueue(stringRequest);
-//    }
+
 
     public static void make(Context ctx, String query, Response.Listener<JSONArray>
             listener, Response.ErrorListener errorListener)

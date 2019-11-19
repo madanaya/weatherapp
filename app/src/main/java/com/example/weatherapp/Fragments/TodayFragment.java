@@ -1,32 +1,26 @@
-package com.example.weatherapp;
+package com.example.weatherapp.Fragments;
 
-import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
-import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.TextView;
 
+import com.example.weatherapp.R;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link ScreenSlidePageFragment.OnFragmentInteractionListener} interface
+ * {@link TodayFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link ScreenSlidePageFragment#newInstance} factory method to
+ * Use the {@link TodayFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-
-public class ScreenSlidePageFragment extends Fragment {
+public class TodayFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -38,7 +32,7 @@ public class ScreenSlidePageFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    public ScreenSlidePageFragment() {
+    public TodayFragment() {
         // Required empty public constructor
     }
 
@@ -48,11 +42,11 @@ public class ScreenSlidePageFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment ScreenSlidePageFragment.
+     * @return A new instance of fragment TodayFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ScreenSlidePageFragment newInstance(String param1, String param2) {
-        ScreenSlidePageFragment fragment = new ScreenSlidePageFragment();
+    public static TodayFragment newInstance(String param1, String param2) {
+        TodayFragment fragment = new TodayFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -73,34 +67,7 @@ public class ScreenSlidePageFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        ViewGroup rootView = (ViewGroup) inflater.inflate(
-                R.layout.fragment_screen_slide_page, container, false);
-
-        final String strtext = getArguments().getString("KEY");
-
-        TextView fragmentTv = (TextView) rootView.findViewById(R.id.fragment_id);
-
-        Button deleteButton = (Button) rootView.findViewById(R.id.delete_button);
-        deleteButton.setText("Delete " + strtext);
-        deleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.d("FRAGMENT ", strtext);
-                Log.d("Parent Instance", getActivity().getLocalClassName());
-            }
-        });
-
-        CardView card_view = (CardView) rootView.findViewById(R.id.card_view);
-        card_view.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(getActivity(), DetailsActivity.class);
-                startActivity(i);
-            }
-        });
-
-
-        return rootView;
+        return inflater.inflate(R.layout.fragment_today, container, false);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -113,12 +80,12 @@ public class ScreenSlidePageFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-//        if (context instanceof OnFragmentInteractionListener) {
-//            mListener = (OnFragmentInteractionListener) context;
-//        } else {
+        if (context instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) context;
+        } else {
 //            throw new RuntimeException(context.toString()
 //                    + " must implement OnFragmentInteractionListener");
-//        }
+        }
     }
 
     @Override

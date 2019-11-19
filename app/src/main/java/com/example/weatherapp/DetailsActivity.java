@@ -1,34 +1,140 @@
 package com.example.weatherapp;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
 import android.app.ActionBar;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
+
+import com.example.weatherapp.Fragments.PhotosFragment;
+import com.example.weatherapp.Fragments.TodayFragment;
+import com.example.weatherapp.Fragments.WeeklyFragment;
+import com.google.android.material.tabs.TabLayout;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DetailsActivity extends AppCompatActivity {
+
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
-        getSupportActionBar().setTitle("Los Angeles, CA, US");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        /* Todo 1:
+           Get data from the bundle and display it
+        * */
+        getSupportActionBar().setTitle("Los Angeles, CA, USA");
+        viewPager = (ViewPager) findViewById(R.id.viewpager);
+        createViewPager(viewPager);
+
+        tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(viewPager);
+        createTabIcons();
+
+        tabLayout.setOnTabSelectedListener(
+                new TabLayout.ViewPagerOnTabSelectedListener(viewPager) {
+
+                    @Override
+                    public void onTabSelected(TabLayout.Tab tab) {
+                        super.onTabSelected(tab);
+//                        int tabIconColor = ContextCompat.getColor(DetailsActivity.this, R.color.colorAccent);
+//                        tab.getIcon().setColorFilter(tabIconColor, PorterDuff.Mode.SRC_IN);
+                    }
+
+                    @Override
+                    public void onTabUnselected(TabLayout.Tab tab) {
+                        super.onTabUnselected(tab);
+//                        int tabIconColor = ContextCompat.getColor(DetailsActivity.this, R.color.colorAccent);
+//                        tab.getIcon().setColorFilter(tabIconColor, PorterDuff.Mode.SRC_IN);
+                    }
+
+                    @Override
+                    public void onTabReselected(TabLayout.Tab tab) {
+                        super.onTabReselected(tab);
+                    }
+                }
+        );
+
+//        TextView tabOne = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+//        tabOne.setText("ONE");
+//        tabOne.setCompoundDrawablesWithIntrinsicBounds(0, R.mipmap.analytics, 0, 0);
+//        tabLayout.getTabAt(0).setCustomView(tabOne);
+//        getSupportActionBar().setTitle("Los Angeles, CA, US");
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    private void createTabIcons() {
+
+        View tabOne = LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        tabLayout.getTabAt(0).setCustomView(tabOne);
+
+
+        View tabTwo = LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        tabLayout.getTabAt(1).setCustomView(tabTwo);
+
+
+        View tabThree = LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        tabLayout.getTabAt(2).setCustomView(tabThree);
+
+    }
+
+    private void createViewPager(ViewPager viewPager) {
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        adapter.addFrag(new TodayFragment(), "Tab 1");
+        adapter.addFrag(new WeeklyFragment(), "Tab 2");
+        adapter.addFrag(new PhotosFragment(), "Tab 3");
+        viewPager.setAdapter(adapter);
+    }
+
+    class ViewPagerAdapter extends FragmentPagerAdapter {
+        private final List<Fragment> mFragmentList = new ArrayList<>();
+        private final List<String> mFragmentTitleList = new ArrayList<>();
+
+        public ViewPagerAdapter(FragmentManager manager) {
+            super(manager);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return mFragmentList.get(position);
+        }
+
+        @Override
+        public int getCount() {
+            return mFragmentList.size();
+        }
+
+        public void addFrag(Fragment fragment, String title) {
+            mFragmentList.add(fragment);
+            mFragmentTitleList.add(title);
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return mFragmentTitleList.get(position);
+        }
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onSupportNavigateUp(){
+        finish();
         return true;
     }
 }

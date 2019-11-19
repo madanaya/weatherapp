@@ -2,6 +2,7 @@ package com.example.weatherapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -9,8 +10,11 @@ import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
-import android.app.AlertDialog;
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -26,10 +30,19 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -98,7 +111,64 @@ public class MainActivity extends AppCompatActivity {
         // 4) Autocomplete Setting up the adapter for AutoSuggest
         autoSuggestAdapter = new AutoSuggestAdapter(this,
                 android.R.layout.simple_dropdown_item_1line);
+
+        // 5) Make API Call
+        getLocation();
+
+
     }
+
+
+    public void getLocation()
+    {
+        LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        @SuppressLint("MissingPermission") Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+        double longitude = location.getLongitude();
+        double latitude = location.getLatitude();
+        Log.d("LATLON", new Double(longitude).toString());
+
+        String latlon = new Double(latitude).toString() + "," + new Double(longitude).toString();
+        String current_location = getCurrentLocationAddress(latlon);
+    }
+
+   public String getCurrentLocationAddress(String latlon){
+
+       RequestQueue queue = Volley.newRequestQueue(this);
+       String url ="https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latlon + "&key=AIzaSyCIdFpOSv3TKDsBv89aLvDWq9gWLgkCL10";
+
+       JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url,null,
+               new Response.Listener<JSONObject>() {
+                   @Override
+                   public void onResponse(JSONObject response) {
+                       try {
+                           String address = response.getJSONObject("plus_code").getString("compound_code");
+                           String parts [] = address.split(" ");
+                           StringBuilder req_address = new StringBuilder();
+
+                           for(int i = 1; i < parts.length; i++){
+                               req_address.append(parts[i]);
+                           }
+
+                           Log.d("RESPONSE ", req_address.toString());
+                       } catch (JSONException e) {
+                           e.printStackTrace();
+                       }
+                   }
+               }, new Response.ErrorListener() {
+           @Override
+           public void onErrorResponse(VolleyError error) {
+               //textView.setText("That didn't work!");
+               Log.d("RESPONSE","MESSAGE");
+           }
+       });
+
+       queue.add(jsonRequest);
+       return "abc";
+   }
+
+
+
 
 
     @Override
@@ -119,12 +189,20 @@ public class MainActivity extends AppCompatActivity {
      */
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
 
-        List<Fragment> screen_fragments = new ArrayList<>();
+        public List<Fragment> screen_fragments = new ArrayList<>();
 
         public ScreenSlidePagerAdapter(FragmentManager fm) {
             super(fm);
+//
+//            Bundle bundle = new Bundle();
+//            bundle.putString("KEY", new Integer(i).toString());
+//            ScreenSlidePageFragment fragobj = new ScreenSlidePageFragment();
+//            fragobj.setArguments(bundle);
+//            screen_fragments.add(fragobj);
 
-            for(int i = 0; i < NUM_PAGES; i++){
+            for(int i = 0; i < NUM_PAGES; i++)
+            {
+
                 Bundle bundle = new Bundle();
                 bundle.putString("KEY", new Integer(i).toString());
                 ScreenSlidePageFragment fragobj = new ScreenSlidePageFragment();
@@ -134,15 +212,30 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public Fragment getItem(int position) {
-
+        public Fragment getItem(int position){
             return screen_fragments.get(position);
+        }
+
+        @Override
+        public int getItemPosition(Object object){
+            int index = screen_fragments.indexOf(object);
+
+            if (index == -1)
+                return POSITION_NONE;
+            else
+                return index;
         }
 
         @Override
         public int getCount() {
             return NUM_PAGES;
         }
+
+
+        public void removeAtPosition(int pos){
+            screen_fragments.remove(pos);
+        }
+
     }
 
 
@@ -195,7 +288,6 @@ public class MainActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                //IMPORTANT: set data here and notify
 
             }
         }, new Response.ErrorListener() {
@@ -277,6 +369,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
         return super.onCreateOptionsMenu(menu);
+    }
+
+    private void deleteFragment(int position)
+    {
+
     }
 
 }
