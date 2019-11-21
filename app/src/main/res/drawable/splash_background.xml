@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:opacity="opaque">
+
+    <item android:drawable="@color/colorPrimary" />
+
+    <item
+        android:gravity="center"
+        android:width="101dp"
+        android:height="101dp"
+        android:drawable="@drawable/weather_partly_snowy_rainy" />
+
+    <!--<item-->
+        <!--android:width="120dp"-->
+        <!--android:height="50dp"-->
+        <!--android:gravity="bottom|center"-->
+        <!--android:bottom="50dp"-->
+        <!--android:drawable="@drawable/poweredby_darkbackground"/>-->
+
+</layer-list>

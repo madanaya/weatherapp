@@ -4,16 +4,34 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.SearchManager;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 public class SearchResultsActivity extends AppCompatActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("SearchResultsActivity","Create");
-        handleIntent(getIntent());
+        setContentView(R.layout.activity_search_results);
+
+        getSupportActionBar().setBackgroundDrawable(
+                new ColorDrawable(Color.parseColor("#000000")));
+
+        Intent intent = getIntent();
+        String search_result = "";
+
+        if (intent != null ){
+            search_result = intent.getStringExtra("SEARCH_STREET");
+            if ( search_result == null ){
+                search_result = "Los Angeles, CA, USA";
+            }
+        }
+
+        setTitle(search_result);
+        handleIntent(intent);
     }
 
     @Override
@@ -27,8 +45,30 @@ public class SearchResultsActivity extends AppCompatActivity {
 
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
+            getSupportActionBar().setTitle(query);
+            Boolean search_activity = false;
+            search_activity = intent.getBooleanExtra("SEARCH", false);
+
+
+            if(search_activity){
+                Log.d("Boolean Value", "TRUE");
+            }
+            else{
+                Log.d("Boolean Value", "FALSE");
+            }
+
+
+            try {
+                Log.d("SLEEP", "START");
+                Thread.sleep(3000);
+                findViewById(R.id.progress_indicator).setVisibility(View.INVISIBLE);
+                findViewById(R.id.content).setVisibility(View.VISIBLE);
+                Log.d("SLEEP", "END");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             //use the query to search your data somehow
-            Log.d("SEARCHVIEW ", "Handle Intent");
+            Log.d("SEARCHVIEW ", query);
         }
     }
 

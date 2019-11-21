@@ -78,7 +78,6 @@ public class ScreenSlidePageFragment extends Fragment {
 
         final String strtext = getArguments().getString("KEY");
 
-        TextView fragmentTv = (TextView) rootView.findViewById(R.id.fragment_id);
 
         Button deleteButton = (Button) rootView.findViewById(R.id.delete_button);
         deleteButton.setText("Delete " + strtext);

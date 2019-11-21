@@ -9,19 +9,24 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import android.app.ActionBar;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.weatherapp.Fragments.PhotosFragment;
 import com.example.weatherapp.Fragments.TodayFragment;
 import com.example.weatherapp.Fragments.WeeklyFragment;
 import com.google.android.material.tabs.TabLayout;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +41,8 @@ public class DetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
 
         /* Todo 1:
            Get data from the bundle and display it
@@ -54,15 +61,23 @@ public class DetailsActivity extends AppCompatActivity {
                     @Override
                     public void onTabSelected(TabLayout.Tab tab) {
                         super.onTabSelected(tab);
-//                        int tabIconColor = ContextCompat.getColor(DetailsActivity.this, R.color.colorAccent);
-//                        tab.getIcon().setColorFilter(tabIconColor, PorterDuff.Mode.SRC_IN);
+
+                        ImageView imgView = tab.getCustomView().findViewById(R.id.icon_tab);
+                        imgView.setColorFilter(getResources().getColor(R.color.colorWhite));
+
+                        TextView tv = tab.getCustomView().findViewById(R.id.text_tab);
+                        tv.setTextColor(getResources().getColor(R.color.colorWhite));
+
                     }
 
                     @Override
                     public void onTabUnselected(TabLayout.Tab tab) {
                         super.onTabUnselected(tab);
-//                        int tabIconColor = ContextCompat.getColor(DetailsActivity.this, R.color.colorAccent);
-//                        tab.getIcon().setColorFilter(tabIconColor, PorterDuff.Mode.SRC_IN);
+                        ImageView imgView = tab.getCustomView().findViewById(R.id.icon_tab);
+                        imgView.setColorFilter(getResources().getColor(R.color.colorDarkGrey));
+
+                        TextView tv = tab.getCustomView().findViewById(R.id.text_tab);
+                        tv.setTextColor(getResources().getColor(R.color.colorDarkGrey));
                     }
 
                     @Override
@@ -83,14 +98,34 @@ public class DetailsActivity extends AppCompatActivity {
     private void createTabIcons() {
 
         View tabOne = LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        ImageView imgView = tabOne.findViewById(R.id.icon_tab);
+        imgView.setImageResource(R.drawable.calendar_today);
+
+        TextView tabTv = tabOne.findViewById(R.id.text_tab);
+        tabTv.setText("TODAY");
+        tabTv.setTextColor(getResources().getColor(R.color.colorWhite));
         tabLayout.getTabAt(0).setCustomView(tabOne);
 
 
         View tabTwo = LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        ImageView imgView2 = tabTwo.findViewById(R.id.icon_tab);
+        imgView2.setImageResource(R.drawable.trending_up);
+        imgView2.setColorFilter(getResources().getColor(R.color.colorDarkGrey));
+
+
+        TextView tabTv2 = tabTwo.findViewById(R.id.text_tab);
+        tabTv2.setText("WEEKLY");
+
         tabLayout.getTabAt(1).setCustomView(tabTwo);
 
 
         View tabThree = LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        ImageView imgView3 = tabThree.findViewById(R.id.icon_tab);
+        imgView3.setImageResource(R.drawable.google_photos);
+        imgView3.setColorFilter(getResources().getColor(R.color.colorDarkGrey));
+
+        TextView tabTv3 = tabThree.findViewById(R.id.text_tab);
+        tabTv3.setText("PHOTOS");
         tabLayout.getTabAt(2).setCustomView(tabThree);
 
     }

@@ -5,6 +5,7 @@
     android:layout_height="wrap_content">
 
     <ImageView
+        android:id="@+id/icon_tab"
         android:layout_gravity="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -12,13 +13,14 @@
         />
 
     <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/tab"
+        android:layout_marginTop="10dp"
+        android:id="@+id/text_tab"
         android:layout_gravity="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:textColor="#FFFFFF"
+        android:textColor="@color/colorDarkGrey"
         android:textSize="15dp"
         android:text="Tab"
-        android:textStyle="bold" />
+         />
 </LinearLayout>

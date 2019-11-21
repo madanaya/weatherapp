@@ -2,7 +2,6 @@ package com.example.weatherapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
-import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -12,6 +11,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
@@ -30,6 +30,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -66,12 +67,14 @@ public class MainActivity extends AppCompatActivity {
      * The pager adapter, which provides the pages to the view pager widget.
      */
 
+    private ProgressBar spinner;
     private SearchView.SearchAutoComplete searchAutoComplete;
     private PagerAdapter pagerAdapter;
     private SearchView searchView;
     private int dotsCount=5;    //No of tabs or images
     private ImageView[] dots;
     LinearLayout linearLayout;
+    LinearLayout progress_linear_layout;
 
     private static final int TRIGGER_AUTO_COMPLETE = 100;
     private static final long AUTO_COMPLETE_DELAY = 300;
@@ -165,11 +168,7 @@ public class MainActivity extends AppCompatActivity {
 
        queue.add(jsonRequest);
        return "abc";
-   }
-
-
-
-
+    }
 
     @Override
     public void onBackPressed() {
@@ -335,6 +334,18 @@ public class MainActivity extends AppCompatActivity {
                 String queryString= (String) adapterView.getItemAtPosition(itemIndex);
                 Log.d("ITEMCLICK",queryString);
                 searchAutoComplete.setText("" + queryString);
+
+                /*
+                    User has submitted search.
+                    We need to handle it
+                 */
+
+                Intent i = new Intent(MainActivity.this, SearchResultsActivity.class);
+                i.putExtra("SEARCH", true);
+                startActivity(i);
+
+
+//                spinner.setVisibility(View.VISIBLE);
 
             }
         });
