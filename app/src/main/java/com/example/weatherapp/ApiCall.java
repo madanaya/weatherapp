@@ -43,7 +43,7 @@ public class ApiCall {
             listener, Response.ErrorListener errorListener)
     {
 
-        String url = "https://weather-node-app-259004.appspot.com/getAutocompleteSuggestion/" + query;
+        String url = "https://nodeweather.azurewebsites.net/getSuggestions/" + query;
         JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url, null,
                 listener, errorListener);
         ApiCall.getInstance(ctx).addToRequestQueue(request);

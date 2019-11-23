@@ -9,8 +9,19 @@ import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,6 +31,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -30,6 +42,7 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.material.tabs.TabLayout;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -52,18 +65,24 @@ public class MainActivityBackup extends AppCompatActivity {
     private ViewPager mPager;
     private String[] dataArr;
 
-    private List<String> suggestions = new ArrayList<>();
     private ArrayAdapter<String> locationsAdapter;
     /**
      * The pager adapter, which provides the pages to the view pager widget.
      */
 
+    private ProgressBar spinner;
     private SearchView.SearchAutoComplete searchAutoComplete;
     private PagerAdapter pagerAdapter;
     private SearchView searchView;
     private int dotsCount=5;    //No of tabs or images
     private ImageView[] dots;
     LinearLayout linearLayout;
+    LinearLayout progress_linear_layout;
+
+    private static final int TRIGGER_AUTO_COMPLETE = 100;
+    private static final long AUTO_COMPLETE_DELAY = 300;
+    private Handler handler;
+    private AutoSuggestAdapter autoSuggestAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,13 +92,14 @@ public class MainActivityBackup extends AppCompatActivity {
 
         // 1) Creating a new view pager
         mPager = (ViewPager) findViewById(R.id.pager);
-
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabDots);
+        tabLayout.setupWithViewPager(mPager, true);
         // 2) Creating a new pager adapter
-        pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
+        pagerAdapter = new MainActivityBackup.ScreenSlidePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(pagerAdapter);
 
         // 3) Set current page and set page change listener
-        drawPageSelectionIndicators(0);
+        //drawPageSelectionIndicators(0);
         mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -87,15 +107,73 @@ public class MainActivityBackup extends AppCompatActivity {
 
             @Override
             public void onPageSelected(int position) {
-                drawPageSelectionIndicators(position);
+
+                //drawPageSelectionIndicators(position);
             }
 
             @Override
             public void onPageScrollStateChanged(int state) {
             }
         });
+
+        // 4) Autocomplete Setting up the adapter for AutoSuggest
+        autoSuggestAdapter = new AutoSuggestAdapter(this,
+                android.R.layout.simple_dropdown_item_1line);
+
+        // 5) Make API Call
+        getLocation();
+
+
     }
 
+
+    public void getLocation()
+    {
+        LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        @SuppressLint("MissingPermission") Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+        double longitude = location.getLongitude();
+        double latitude = location.getLatitude();
+        Log.d("LATLON", new Double(longitude).toString());
+
+        String latlon = new Double(latitude).toString() + "," + new Double(longitude).toString();
+        String current_location = getCurrentLocationAddress(latlon);
+    }
+
+    public String getCurrentLocationAddress(String latlon){
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+        String url ="https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latlon + "&key=AIzaSyCIdFpOSv3TKDsBv89aLvDWq9gWLgkCL10";
+
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url,null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            String address = response.getJSONObject("plus_code").getString("compound_code");
+                            String parts [] = address.split(" ");
+                            StringBuilder req_address = new StringBuilder();
+
+                            for(int i = 1; i < parts.length; i++){
+                                req_address.append(parts[i]);
+                            }
+
+                            Log.d("RESPONSE ", req_address.toString());
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //textView.setText("That didn't work!");
+                Log.d("RESPONSE","MESSAGE");
+            }
+        });
+
+        queue.add(jsonRequest);
+        return "abc";
+    }
 
     @Override
     public void onBackPressed() {
@@ -115,57 +193,112 @@ public class MainActivityBackup extends AppCompatActivity {
      */
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
 
-        List<Fragment> screen_fragments = new ArrayList<>();
+        public List<Fragment> screen_fragments = new ArrayList<>();
 
         public ScreenSlidePagerAdapter(FragmentManager fm) {
             super(fm);
+//
+//            Bundle bundle = new Bundle();
+//            bundle.putString("KEY", new Integer(i).toString());
+//            ScreenSlidePageFragment fragobj = new ScreenSlidePageFragment();
+//            fragobj.setArguments(bundle);
+//            screen_fragments.add(fragobj);
 
-            for(int i = 0; i < NUM_PAGES; i++){
+            for(int i = 0; i < NUM_PAGES; i++)
+            {
+
                 Bundle bundle = new Bundle();
                 bundle.putString("KEY", new Integer(i).toString());
                 ScreenSlidePageFragment fragobj = new ScreenSlidePageFragment();
                 fragobj.setArguments(bundle);
                 screen_fragments.add(fragobj);
             }
-//            List<Fragment> screen_fragments = new ArrayList<>();
         }
 
         @Override
-        public Fragment getItem(int position) {
-
+        public Fragment getItem(int position){
             return screen_fragments.get(position);
+        }
+
+        @Override
+        public int getItemPosition(Object object){
+            int index = screen_fragments.indexOf(object);
+
+            if (index == -1)
+                return POSITION_NONE;
+            else
+                return index;
         }
 
         @Override
         public int getCount() {
             return NUM_PAGES;
         }
+
+
+        public void removeAtPosition(int pos){
+            screen_fragments.remove(pos);
+        }
+
     }
 
 
-    private void drawPageSelectionIndicators(int mPosition){
-        Log.d("DRAW PAGE SELECTED ", new Integer(mPosition).toString());
-        if(linearLayout!=null) {
-            linearLayout.removeAllViews();
-        }
-        linearLayout= findViewById(R.id.viewPagerCountDots);
-        dots = new ImageView[dotsCount];
+//    private void drawPageSelectionIndicators(int mPosition){
+//        Log.d("DRAW PAGE SELECTED ", new Integer(mPosition).toString());
+//        if(linearLayout!=null) {
+//            linearLayout.removeAllViews();
+//        }
+//        linearLayout= findViewById(R.id.viewPagerCountDots);
+//        dots = new ImageView[dotsCount];
+//
+//        for (int i = 0; i < dotsCount; i++) {
+//            dots[i] = new ImageView(MainActivity.this);
+//            if(i==mPosition)
+//                dots[i].setImageDrawable(getResources().getDrawable(R.drawable.item_selected));
+//            else
+//                dots[i].setImageDrawable(getResources().getDrawable(R.drawable.item_unselected));
+//
+//            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+//                    LinearLayout.LayoutParams.WRAP_CONTENT,
+//                    LinearLayout.LayoutParams.WRAP_CONTENT
+//            );
+//
+//            params.setMargins(4, 0, 4, 0);
+//            linearLayout.addView(dots[i], params);
+//        }
+//    }
 
-        for (int i = 0; i < dotsCount; i++) {
-            dots[i] = new ImageView(MainActivityBackup.this);
-            if(i==mPosition)
-                dots[i].setImageDrawable(getResources().getDrawable(R.drawable.item_selected));
-            else
-                dots[i].setImageDrawable(getResources().getDrawable(R.drawable.item_unselected));
+    private void makeApiCall(String text) {
+        ApiCall.make(this, text, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                //parsing logic, please change it as per your requirement
+                Log.d("Json Response", response.toString());
+                List<String> stringList = new ArrayList<>();
+                try {
 
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-            );
+                    for(int i = 0; i < response.length(); i++) {
+                        try {
+                            stringList.add(response.getString(i));
 
-            params.setMargins(4, 0, 4, 0);
-            linearLayout.addView(dots[i], params);
-        }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    autoSuggestAdapter.setData(stringList);
+                    autoSuggestAdapter.notifyDataSetChanged();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+            }
+        });
     }
 
     @Override
@@ -181,196 +314,83 @@ public class MainActivityBackup extends AppCompatActivity {
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchMenu);
 
         // Get SearchView autocomplete object.
-        searchAutoComplete = (SearchView.SearchAutoComplete)searchView.findViewById(R.id.search_src_text);
-        searchAutoComplete.setBackgroundColor(getResources().getColor(R.color.colorVeryDarkGrey));
-        searchAutoComplete.setTextColor(getResources().getColor(R.color.colorWhite));
+        final SearchView.SearchAutoComplete searchAutoComplete = (SearchView.SearchAutoComplete)searchView.findViewById(R.id.search_src_text);
+        searchAutoComplete.setBackgroundColor(Color.BLUE);
+        searchAutoComplete.setTextColor(Color.GREEN);
         searchAutoComplete.setDropDownBackgroundResource(android.R.color.white);
+        searchAutoComplete.setThreshold(1);
+        searchAutoComplete.setAdapter(autoSuggestAdapter);
 
-        suggestions.add("Apple");
-        suggestions.add("Amazon");
-        suggestions.add("Akamai");
-        suggestions.add("Akuna Capital");
-
-        // Create a new ArrayAdapter and add data to search auto complete object.
-        dataArr = new String[]{"Apple" , "Amazon" , "Amd", "Microsoft", "Microwave", "MicroNews", "Intel", "Intelligence"};
-        locationsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, suggestions);
-        searchAutoComplete.setAdapter(locationsAdapter);
-
-//        searchAutoComplete.addTextChangedListener(new TextWatcher() {
-//            @Override
-//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-//
-//            }
-//
-//            @Override
-//            public void onTextChanged(CharSequence s, int start, int before, int count) {
-//                retrieveData(s.toString());
-//            }
-//
-//            @Override
-//            public void afterTextChanged(Editable s) {
-//                //retrieveData(s.toString()); //this will call your method every time the user stops typing, if you want to call it for each letter, call it in onTextChanged
-//
-//            }
-//        });
-
-        // Listen to search view item on click event.
-        searchAutoComplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int itemIndex, long id) {
-
-                String queryString=(String)adapterView.getItemAtPosition(itemIndex);
-                Log.d("ITEMCLICK",queryString);
-                searchAutoComplete.setText("" + queryString);
-                Toast.makeText(MainActivityBackup.this, "you clicked " + queryString, Toast.LENGTH_LONG).show();
-            }
-
-
-        });
-
-        // Below event is triggered when submit search query.
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                AlertDialog alertDialog = new AlertDialog.Builder(MainActivityBackup.this).create();
-                alertDialog.setMessage("Search keyword is " + query);
-                alertDialog.show();
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                Log.d("QUERY CHANGE", newText);
-//                if(newText.startsWith("a")){
-//                    dataArr = new String[]{"abc", "abbb", "abbdsfsdfa", "abbaa"};
-//                }
-//                else{
-//                    dataArr = new String[]{"baa", "bac", "badwes", "bsdfae"};
-//                }
-//
-//                // 2) After receiving the data, create new adapter
-//                ArrayAdapter<String> newsAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_dropdown_item_1line, dataArr);
-//                searchAutoComplete.setAdapter(newsAdapter);
-                retrieveData(newText);
-
-//                ArrayAdapter<String> newsAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_dropdown_item_1line, dataArr);
-//                searchAutoComplete.setAdapter(newsAdapter);
-
-                return false;
-            }
-        });
-
-
-        return super.onCreateOptionsMenu(menu);
-
-    }
-
-    private void retrieveData(String s){
-        // 1) Make an API call
-
-
-        RequestQueue queue = Volley.newRequestQueue(this);
-        String url ="https://weather-node-app-259004.appspot.com/getAutocompleteSuggestion/" + s;
-
-        // Request a string response from the provided URL.
-//        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-////                new Response.Listener<String>() {
-////                    @Override
-////                    public void onResponse(String response) {
-////                        // Display the first 500 characters of the response string.
-////
-////                        ArrayAdapter<String> newsAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_dropdown_item_1line, dataArr);
-////                        searchAutoComplete.setAdapter(newsAdapter);
-////                        Log.d("VOLLEY REQUEST ", response);
-//////                        textView.setText("Response is: "+ response.substring(0,500));
-////                    }
-////                }, new Response.ErrorListener() {
-////            @Override
-////            public void onErrorResponse(VolleyError error) {
-////                Log.d("VOLLEY RESPONSE ", error.toString());
-////                //Log.d("Received Response ", response);
-////            }
-////        });
-
-        JsonArrayRequest jsonObjectRequest = new JsonArrayRequest
-                (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
-
+        searchAutoComplete.setOnItemClickListener(
+                new AdapterView.OnItemClickListener() {
                     @Override
-                    public void onResponse(JSONArray response) {
+                    public void onItemClick(AdapterView<?> parent, View view,
+                                            int position, long id) {
 
-                        dataArr = new String[response.length()];
-                        for(int i = 0; i < response.length(); i++) {
-                            try {
-                                dataArr[i] = response.getString(i);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        for(int j = 0; j < response.length(); j++){
-                            Log.d("ARR VAL", dataArr[j]);
-                        }
-
-
-                        ArrayAdapter<String> newsAdapter = new ArrayAdapter<String>(MainActivityBackup.this, android.R.layout.simple_dropdown_item_1line, dataArr);
-                        searchAutoComplete.setAdapter(newsAdapter);
-
-                        Log.d("VOLLEY RESPONSE ", response.toString());
-                        Log.d("VOLLEY RESPONSE ", dataArr.toString());
-
-                    }
-                }, new Response.ErrorListener() {
-
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // TODO: Handle error
-                        Log.d("VOLLEY error ", error.toString());
+                        Log.d("Item Click", autoSuggestAdapter.getObject(position));
+                        searchAutoComplete.setText(autoSuggestAdapter.getObject(position));
                     }
                 });
 
 
-// Add the request to the RequestQueue.
-        queue.add(jsonObjectRequest);
+        searchAutoComplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int itemIndex, long id) {
+                String queryString= (String) adapterView.getItemAtPosition(itemIndex);
+                Log.d("ITEMCLICK",queryString);
+                searchAutoComplete.setText("" + queryString);
+
+                /*
+                    User has submitted search.
+                    We need to handle it
+                 */
+
+                Intent i = new Intent(MainActivityBackup.this, SearchResultsActivity.class);
+                i.putExtra("SEARCH", true);
+                startActivity(i);
 
 
-//        if(s.startsWith("a")){
-//            dataArr = new String[]{"abc", "abbb", "abbdsfsdfa", "abbaa"};
-//        }
-//        else{
-//            dataArr = new String[]{"baa", "bac", "badwes", "bsdfae"};
-//        }
-//
-//        // 2) After receiving the data, create new adapter
-//        ArrayAdapter<String> newsAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_dropdown_item_1line, dataArr);
-//        searchAutoComplete.setAdapter(newsAdapter);
+//                spinner.setVisibility(View.VISIBLE);
+
+            }
+        });
+
+        searchAutoComplete.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int
+                    count, int after) {
+            }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before,
+                                      int count) {
+                handler.removeMessages(TRIGGER_AUTO_COMPLETE);
+                handler.sendEmptyMessageDelayed(TRIGGER_AUTO_COMPLETE,
+                        AUTO_COMPLETE_DELAY);
+            }
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
+        handler = new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(Message msg) {
+                if (msg.what == TRIGGER_AUTO_COMPLETE) {
+                    if (!TextUtils.isEmpty(searchAutoComplete.getText())) {
+                        makeApiCall(searchAutoComplete.getText().toString());
+                    }
+                }
+                return false;
+            }
+        });
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    private void deleteFragment(int position)
+    {
 
     }
 
-
-
-//    @Override
-//    public boolean onQueryTextSubmit(String query) {
-//        AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-//        alertDialog.setMessage("Search keyword is " + query);
-//        alertDialog.show();
-//        return false;
-//    }
-//
-//    @Override
-//    public boolean onQueryTextChange(String newText) {
-//        Log.d("QUERY CHANGE", newText);
-//
-//        return false;
-//    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        switch (item.getItemId()) {
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
 
 }

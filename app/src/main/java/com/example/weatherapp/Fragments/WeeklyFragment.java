@@ -1,6 +1,7 @@
 package com.example.weatherapp.Fragments;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -13,6 +14,8 @@ import android.widget.LinearLayout;
 
 import com.example.weatherapp.R;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.LegendEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -20,6 +23,7 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -81,16 +85,46 @@ public class WeeklyFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_weekly, container, false);
 
         LineChart chart = (LineChart) view.findViewById(R.id.chart);
-        LineDataSet lineDataSet1 =  new LineDataSet(dataValues1(), "Data Set 1");
-        LineDataSet lineDataSet2 =  new LineDataSet(dataValues2(), "Data Set 1");
-
+        LineDataSet lineDataSet1 =  new LineDataSet(dataValues1(), "Temperature Min");
+        LineDataSet lineDataSet2 =  new LineDataSet(dataValues2(), "Temperature Max");
+        lineDataSet1.setColor(Color.parseColor("#B075F4"));
+        lineDataSet2.setColor(Color.parseColor("#DF9108"));
         ArrayList<ILineDataSet> dataSets = new ArrayList<>();
         dataSets.add(lineDataSet1);
         dataSets.add(lineDataSet2);
 
         LineData data = new LineData(dataSets);
+        chart.getAxisLeft().setTextColor(getResources().getColor(R.color.colorWhite));
+        chart.getXAxis().setTextColor(getResources().getColor(R.color.colorWhite));
+        chart.getLegend().setTextColor(getResources().getColor(R.color.colorWhite));
+
+
+        Legend legend = chart.getLegend();
+        legend.setTextSize(15);
+        List<LegendEntry> legends = new ArrayList<>();
+        LegendEntry purple = new LegendEntry();
+        purple.label = "Minimum Temperature";
+        purple.formColor = Color.parseColor("#B075F4");
+        purple.formSize = 18;
+        legends.add(purple);
+
+
+        LegendEntry orange = new LegendEntry();
+        orange.label = "Maximum Temperature";
+        orange.formColor = Color.parseColor("#DF9108");
+        orange.formSize = 18;
+        legends.add(orange);
+
+        chart.getLegend().setCustom(legends);
+        legend.setForm(Legend.LegendForm.SQUARE);
+
+
+
+
         chart.setData(data);
         chart.invalidate();
+
+
         return view;
     }
 
@@ -103,6 +137,9 @@ public class WeeklyFragment extends Fragment {
         dataVals.add(new Entry(2,40));
         dataVals.add(new Entry(3,50));
         dataVals.add(new Entry(4,60));
+        dataVals.add(new Entry(5,70));
+        dataVals.add(new Entry(6,80));
+        dataVals.add(new Entry(7,90));
 
         return dataVals;
     }
@@ -115,6 +152,9 @@ public class WeeklyFragment extends Fragment {
         dataVals.add(new Entry(2,20));
         dataVals.add(new Entry(3,30));
         dataVals.add(new Entry(4,90));
+        dataVals.add(new Entry(5,20));
+        dataVals.add(new Entry(6,70));
+        dataVals.add(new Entry(7,80));
 
         return dataVals;
     }

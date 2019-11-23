@@ -6,12 +6,20 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <!--<item name="windowActionBar">false</item>-->
-        <!--<item name="windowNoTitle">true</item>-->
+    </style>
+
+    <style name="myAutoCompleteTextViewStyle" parent="Widget.AppCompat.Light.AutoCompleteTextView">
+        <item name="android:popupBackground">#ffffff</item>
+    </style>
+
+    <style name="mySearchResult" parent="TextAppearance.AppCompat.SearchResult.Title">
+        <item name="android:textColor">#000000</item>
     </style>
 
     <style name="AppTheme.Launcher" parent ="Theme.AppCompat">
         <item name="android:windowBackground">@drawable/splash_background</item>
+        <!--<item name="autoCompleteTextViewStyle">@style/myAutoCompleteTextViewStyle</item>-->
+        <!--<item name="textAppearanceSearchResultTitle">@style/mySearchResult</item>-->
     </style>
 
 </resources>

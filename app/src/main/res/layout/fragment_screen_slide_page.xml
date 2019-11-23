@@ -1,8 +1,9 @@
-<LinearLayout
+<RelativeLayout
 
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/content"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimaryDark">
@@ -14,17 +15,15 @@
         android:orientation="vertical"
         >
 
-
-        <!-- A CardView that contains a TextView -->
         <androidx.cardview.widget.CardView
             xmlns:card_view="http://schemas.android.com/apk/res-auto"
             android:id="@+id/card_view"
             android:layout_width="match_parent"
-            android:layout_height="180sp"
+            android:layout_height="170sp"
             android:layout_gravity="center"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="5dp"
             card_view:cardBackgroundColor="@color/colorVeryDarkGrey"
             card_view:cardCornerRadius="10dp">
 
@@ -33,10 +32,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="50sp"
+                    android:layout_marginTop="30sp"
                     android:orientation="horizontal"
                     android:weightSum="100">
 
@@ -44,16 +44,17 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="right"
-                        android:layout_weight="20"
+                        android:layout_marginRight="10sp"
+                        android:layout_weight="30"
                         android:gravity="right"
                         android:orientation="horizontal">
 
                         <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_width="86sp"
+                            android:layout_height="86sp"
                             android:layout_gravity="end"
                             android:foregroundGravity="right"
-                            android:src="@mipmap/ic_launcher" />
+                            android:src="@drawable/weather_night_partly_cloudy" />
 
                     </LinearLayout>
 
@@ -61,13 +62,15 @@
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="60"
+                        android:layout_weight="70"
                         android:orientation="vertical">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="left"
+                            android:textStyle="bold"
+                            android:textSize="33sp"
                             android:text="70.42"
                             android:textColor="@color/colorWhite" />
 
@@ -75,6 +78,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="left"
+                            android:textSize="20sp"
                             android:text="Clear"
                             android:textColor="@color/colorDarkGrey" />
 
@@ -89,6 +93,8 @@
                 <!--android:layout_height="match_parent" />-->
 
                 <LinearLayout
+                    android:layout_marginTop="20sp"
+                    android:layout_marginBottom="5sp"
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -98,15 +104,16 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
+                        android:textSize="20sp"
                         android:text="Los Angeles, CA, USA"
                         android:textColor="@color/colorWhite" />
 
                 </LinearLayout>
 
-
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
+
 
 
         <!-- A CardView that contains a TextView -->
@@ -114,7 +121,7 @@
             xmlns:card_view="http://schemas.android.com/apk/res-auto"
             android:id="@+id/card_view2"
             android:layout_gravity="center"
-
+            android:layout_marginTop="5dp"
             android:layout_width= "match_parent"
             android:layout_height="140sp"
             android:layout_marginLeft="10dp"
@@ -122,173 +129,244 @@
             card_view:cardBackgroundColor="@color/colorVeryDarkGrey"
             card_view:cardCornerRadius="10dp">
 
-            <LinearLayout
-                android:layout_gravity="center"
+            <TableLayout
                 android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <TableRow
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <LinearLayout
-                    android:weightSum="100"
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:layout_margin="5dp"
+                android:layout_weight="10">
 
 
-                    <!-- Humidity Column -->
+                <androidx.cardview.widget.CardView
+                    android:paddingTop="10sp"
+                    android:layout_weight="2.5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="20sp"
+                    android:background="@color/colorVeryDarkGrey"
+                    card_view:cardCornerRadius="10sp"
+                    >
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_width="match_parent"
                         android:orientation="vertical"
                         android:layout_height="match_parent"
-                        android:layout_weight="25"
+                        android:background="@color/colorVeryDarkGrey"
+                        android:paddingTop="10sp"
+                        android:paddingBottom="10sp"
                         >
+
                         <ImageView
                             android:layout_gravity="center"
                             android:tint="@color/colorIcon"
                             android:src="@drawable/water_percent"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_width="40sp"
+                            android:layout_height="40sp"
                             />
+
                         <TextView
+                            android:layout_marginTop="2sp"
                             android:layout_gravity="center"
                             android:gravity="center"
                             android:id="@+id/humidity_val"
-                            android:text="61%"
+                            android:textSize="20sp"
+                            android:text="60%"
                             android:textColor="@color/colorWhite"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             />
 
                         <TextView
+                            android:layout_marginTop="10sp"
                             android:gravity="center"
                             android:layout_gravity="center"
                             android:text="Humidity"
+                            android:textSize="16sp"
                             android:textColor="@color/colorDarkGrey"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             />
                     </LinearLayout>
 
+                </androidx.cardview.widget.CardView>
 
-                    <!-- Windspeed Column -->
+
+
+                <androidx.cardview.widget.CardView
+                    android:paddingTop="10sp"
+                    android:layout_weight="2.5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="20sp"
+                    android:background="@color/colorVeryDarkGrey"
+                    card_view:cardCornerRadius="10sp"
+                    >
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_width="match_parent"
                         android:orientation="vertical"
                         android:layout_height="match_parent"
-                        android:layout_weight="25"
+                        android:background="@color/colorVeryDarkGrey"
+                        android:paddingTop="10sp"
+                        android:paddingBottom="10sp"
+                        >
+
+                        <ImageView
+                            android:layout_gravity="center"
+                            android:tint="@color/colorIcon"
+                            android:src="@drawable/eye_outline"
+                            android:layout_width="40sp"
+                            android:layout_height="40sp"
+                            />
+
+                        <TextView
+                            android:layout_marginTop="2sp"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:id="@+id/visbility_val"
+                            android:textSize="20sp"
+                            android:text="1.02 mph"
+                            android:textColor="@color/colorWhite"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <TextView
+                            android:layout_marginTop="10sp"
+                            android:gravity="center"
+                            android:layout_gravity="center"
+                            android:text="Visibility"
+                            android:textSize="16sp"
+                            android:textColor="@color/colorDarkGrey"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+
+                <androidx.cardview.widget.CardView
+                    android:paddingTop="10sp"
+                    android:layout_weight="2.5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="@color/colorVeryDarkGrey"
+                    card_view:cardCornerRadius="10sp"
+                    >
+                    <LinearLayout
+                        android:layout_gravity="center"
+                        android:layout_width="match_parent"
+                        android:orientation="vertical"
+                        android:layout_height="match_parent"
+                        android:background="@color/colorVeryDarkGrey"
+                        android:paddingTop="10sp"
+                        android:paddingBottom="10sp"
                         >
 
                         <ImageView
                             android:layout_gravity="center"
                             android:tint="@color/colorIcon"
                             android:src="@drawable/weather_windy"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_width="40sp"
+                            android:layout_height="40sp"
                             />
 
                         <TextView
+                            android:layout_marginTop="2sp"
                             android:layout_gravity="center"
                             android:gravity="center"
                             android:id="@+id/windspeed_val"
-                            android:text="4.37 mph"
+                            android:textSize="20sp"
+                            android:text="6.17 km"
                             android:textColor="@color/colorWhite"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             />
 
-
                         <TextView
+                            android:layout_marginTop="10sp"
+                            android:gravity="center"
                             android:layout_gravity="center"
                             android:text="Wind Speed"
+                            android:textSize="16sp"
                             android:textColor="@color/colorDarkGrey"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             />
                     </LinearLayout>
 
+                </androidx.cardview.widget.CardView>
 
-
-                    <!-- Visibility Column -->
+                <androidx.cardview.widget.CardView
+                    android:paddingTop="10sp"
+                    android:layout_weight="2.5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="@color/colorVeryDarkGrey"
+                    card_view:cardCornerRadius="10sp"
+                    >
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_width="match_parent"
                         android:orientation="vertical"
                         android:layout_height="match_parent"
-                        android:layout_weight="25"
+                        android:background="@color/colorVeryDarkGrey"
+                        android:paddingTop="10sp"
+                        android:paddingBottom="10sp"
                         >
-                        <ImageView
-                            android:layout_gravity="center"
-                            android:tint="@color/colorIcon"
-                            android:src="@drawable/eye_outline"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
 
-                        <TextView
-                            android:layout_gravity="center"
-                            android:gravity="center"
-                            android:text="4.75 km"
-                            android:textColor="@color/colorWhite"
-                            android:id="@+id/visbility_val"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <TextView
-                            android:layout_gravity="center"
-                            android:text="Visibility"
-                            android:textColor="@color/colorDarkGrey"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
-                    </LinearLayout>
-
-
-                    <!-- Pressure Column -->
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_height="match_parent"
-                        android:layout_weight="25"
-                        >
                         <ImageView
                             android:layout_gravity="center"
                             android:tint="@color/colorIcon"
                             android:src="@drawable/gauge"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_width="40sp"
+                            android:layout_height="40sp"
                             />
+
                         <TextView
+                            android:layout_marginTop="2sp"
                             android:layout_gravity="center"
                             android:gravity="center"
-                            android:text="1014.2 mb"
+                            android:id="@+id/gauge_val"
+                            android:textSize="20sp"
+                            android:text="1017.60 mb"
                             android:textColor="@color/colorWhite"
-                            android:id="@+id/pressure_val"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             />
 
                         <TextView
+                            android:layout_marginTop="10sp"
+                            android:gravity="center"
                             android:layout_gravity="center"
                             android:text="Pressure"
+                            android:textSize="16sp"
                             android:textColor="@color/colorDarkGrey"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             />
                     </LinearLayout>
 
-                </LinearLayout>
+                </androidx.cardview.widget.CardView>
 
-            </LinearLayout>
+            </TableRow>
+            </TableLayout>
+
         </androidx.cardview.widget.CardView>
 
 
         <!-- A CardView that contains a TextView -->
         <androidx.cardview.widget.CardView
-            xmlns:card_view="http://schemas.android.com/apk/res-auto"
             android:id="@+id/card_view3"
             android:layout_gravity="center"
             android:layout_width= "match_parent"
-            android:layout_height="240dp"
+            android:layout_height="270dp"
             android:layout_margin="10dp"
             card_view:cardBackgroundColor="@color/colorVeryDarkGrey"
             card_view:cardCornerRadius="10dp">
@@ -316,7 +394,7 @@
                         <TextView
                             android:id="@+id/row1_date"
                             android:layout_weight="3.5"
-                            android:textSize="17dp"
+                            android:textSize="22dp"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:text="11/15/19"
@@ -337,7 +415,7 @@
                             android:layout_gravity="center"
                             android:id="@+id/row1_tempmin"
                             android:layout_weight="2.5"
-                            android:textSize="20dp"
+                            android:textSize="25dp"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:textColor="@color/colorWhite"
@@ -348,7 +426,7 @@
                         <TextView
                             android:id="@+id/row1_tempmax"
                             android:layout_weight="2.5"
-                            android:textSize="20dp"
+                            android:textSize="25dp"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:textColor="@color/colorWhite"
@@ -360,7 +438,7 @@
                     <View
                         android:layout_width="fill_parent"
                         android:layout_height="2dp"
-                        android:background="@color/colorVeryMediumGrey" />
+                        android:background="@color/colorDarkGrey" />
 
                     <TableRow
                         android:id="@+id/tableRow2"
@@ -373,7 +451,7 @@
                         <TextView
                             android:id="@+id/row2_date"
                             android:layout_weight="3.5"
-                            android:textSize="17dp"
+                            android:textSize="22dp"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:text="11/15/19"
@@ -394,7 +472,7 @@
                             android:layout_gravity="center"
                             android:id="@+id/row2_tempmin"
                             android:layout_weight="2.5"
-                            android:textSize="20dp"
+                            android:textSize="25dp"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:textColor="@color/colorWhite"
@@ -405,7 +483,7 @@
                         <TextView
                             android:id="@+id/row2_tempmax"
                             android:layout_weight="2.5"
-                            android:textSize="20dp"
+                            android:textSize="25dp"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:textColor="@color/colorWhite"
@@ -430,7 +508,7 @@
                         <TextView
                             android:id="@+id/row3_date"
                             android:layout_weight="3.5"
-                            android:textSize="17dp"
+                            android:textSize="22dp"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:text="11/15/19"
@@ -451,7 +529,7 @@
                             android:layout_gravity="center"
                             android:id="@+id/row3_tempmin"
                             android:layout_weight="2.5"
-                            android:textSize="20dp"
+                            android:textSize="25dp"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:textColor="@color/colorWhite"
@@ -462,7 +540,7 @@
                         <TextView
                             android:id="@+id/row3_tempmax"
                             android:layout_weight="2.5"
-                            android:textSize="20dp"
+                            android:textSize="25dp"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:textColor="@color/colorWhite"
@@ -487,7 +565,7 @@
                         <TextView
                             android:id="@+id/row4_date"
                             android:layout_weight="3.5"
-                            android:textSize="17dp"
+                            android:textSize="22dp"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:text="11/15/19"
@@ -508,7 +586,7 @@
                             android:layout_gravity="center"
                             android:id="@+id/row4_tempmin"
                             android:layout_weight="2.5"
-                            android:textSize="20dp"
+                            android:textSize="25dp"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:textColor="@color/colorWhite"
@@ -519,7 +597,7 @@
                         <TextView
                             android:id="@+id/row4_tempmax"
                             android:layout_weight="2.5"
-                            android:textSize="20dp"
+                            android:textSize="25dp"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:textColor="@color/colorWhite"
@@ -544,7 +622,7 @@
                         <TextView
                             android:id="@+id/row5_date"
                             android:layout_weight="3.5"
-                            android:textSize="17dp"
+                            android:textSize="22dp"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:text="11/15/19"
@@ -565,7 +643,7 @@
                             android:layout_gravity="center"
                             android:id="@+id/row5_tempmin"
                             android:layout_weight="2.5"
-                            android:textSize="20dp"
+                            android:textSize="25dp"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:textColor="@color/colorWhite"
@@ -576,7 +654,7 @@
                         <TextView
                             android:id="@+id/row5_tempmax"
                             android:layout_weight="2.5"
-                            android:textSize="20dp"
+                            android:textSize="25dp"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:textColor="@color/colorWhite"
@@ -601,7 +679,7 @@
                         <TextView
                             android:id="@+id/row6_date"
                             android:layout_weight="3.5"
-                            android:textSize="17dp"
+                            android:textSize="22dp"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:text="11/15/19"
@@ -622,7 +700,7 @@
                             android:layout_gravity="center"
                             android:id="@+id/row6_tempmin"
                             android:layout_weight="2.5"
-                            android:textSize="20dp"
+                            android:textSize="25dp"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:textColor="@color/colorWhite"
@@ -633,7 +711,7 @@
                         <TextView
                             android:id="@+id/row6_tempmax"
                             android:layout_weight="2.5"
-                            android:textSize="20dp"
+                            android:textSize="25dp"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:textColor="@color/colorWhite"
@@ -658,7 +736,7 @@
                         <TextView
                             android:id="@+id/row7_date"
                             android:layout_weight="3.5"
-                            android:textSize="17dp"
+                            android:textSize="22dp"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:text="11/15/19"
@@ -679,7 +757,7 @@
                             android:layout_gravity="center"
                             android:id="@+id/row7_tempmin"
                             android:layout_weight="2.5"
-                            android:textSize="20dp"
+                            android:textSize="25dp"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:textColor="@color/colorWhite"
@@ -690,7 +768,7 @@
                         <TextView
                             android:id="@+id/row7_tempmax"
                             android:layout_weight="2.5"
-                            android:textSize="20dp"
+                            android:textSize="25dp"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:textColor="@color/colorWhite"
@@ -716,7 +794,7 @@
                         <TextView
                             android:id="@+id/row8_date"
                             android:layout_weight="3.5"
-                            android:textSize="17dp"
+                            android:textSize="22dp"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:text="11/15/19"
@@ -737,7 +815,7 @@
                             android:layout_gravity="center"
                             android:id="@+id/row8_tempmin"
                             android:layout_weight="2.5"
-                            android:textSize="20dp"
+                            android:textSize="25dp"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:textColor="@color/colorWhite"
@@ -748,7 +826,7 @@
                         <TextView
                             android:id="@+id/row8_tempmax"
                             android:layout_weight="2.5"
-                            android:textSize="20dp"
+                            android:textSize="25dp"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:textColor="@color/colorWhite"
@@ -760,14 +838,23 @@
 
                 </TableLayout>
             </ScrollView>
+
+
         </androidx.cardview.widget.CardView>
 
-
-        <Button
-            android:id="@+id/delete_button"
-            android:text = "Delete"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
     </LinearLayout>
-</LinearLayout>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/floatingActionButton"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_gravity="right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/colorAccent"
+        android:background="@color/colorAccent"
+        android:layout_marginRight="10sp"
+        android:layout_marginBottom="10sp"
+        app:borderWidth="0dp"
+        android:clickable="true"
+        card_view:srcCompat="@drawable/map_marker_minus" />
+</RelativeLayout>

@@ -13,6 +13,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -40,6 +41,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.material.tabs.TabLayout;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -69,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ProgressBar spinner;
     private SearchView.SearchAutoComplete searchAutoComplete;
-    private PagerAdapter pagerAdapter;
+    private ScreenSlidePagerAdapter pagerAdapter;
     private SearchView searchView;
     private int dotsCount=5;    //No of tabs or images
     private ImageView[] dots;
@@ -86,24 +88,31 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getSupportActionBar().show();
+        getSupportActionBar().setBackgroundDrawable(
+                new ColorDrawable(Color.parseColor("#000000")));
 
         // 1) Creating a new view pager
         mPager = (ViewPager) findViewById(R.id.pager);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabDots);
+        tabLayout.setupWithViewPager(mPager, true);
 
         // 2) Creating a new pager adapter
         pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
+
         mPager.setAdapter(pagerAdapter);
 
         // 3) Set current page and set page change listener
-        drawPageSelectionIndicators(0);
+        //drawPageSelectionIndicators(0);
         mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
             }
 
             @Override
             public void onPageSelected(int position) {
-                drawPageSelectionIndicators(position);
+
+                //drawPageSelectionIndicators(position);
             }
 
             @Override
@@ -117,10 +126,11 @@ public class MainActivity extends AppCompatActivity {
 
         // 5) Make API Call
         getLocation();
-
-
     }
 
+    public void removeFragment(int position){
+        pagerAdapter.removeAtPosition(position);
+    }
 
     public void getLocation()
     {
@@ -186,82 +196,78 @@ public class MainActivity extends AppCompatActivity {
      * A simple pager adapter that represents 5 ScreenSlidePageFragment objects, in
      * sequence.
      */
-    private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
-
-        public List<Fragment> screen_fragments = new ArrayList<>();
-
-        public ScreenSlidePagerAdapter(FragmentManager fm) {
-            super(fm);
+//    public class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
 //
-//            Bundle bundle = new Bundle();
-//            bundle.putString("KEY", new Integer(i).toString());
-//            ScreenSlidePageFragment fragobj = new ScreenSlidePageFragment();
-//            fragobj.setArguments(bundle);
-//            screen_fragments.add(fragobj);
+//        public List<Fragment> screen_fragments = new ArrayList<>();
+//
+//        public ScreenSlidePagerAdapter(FragmentManager fm) {
+//            super(fm);
+//
+//
+//            for(int i = 0; i < NUM_PAGES; i++)
+//            {
+//
+//                Bundle bundle = new Bundle();
+//                bundle.putString("KEY", new Integer(i).toString());
+//                ScreenSlidePageFragment fragobj = new ScreenSlidePageFragment();
+//                fragobj.setArguments(bundle);
+//                screen_fragments.add(fragobj);
+//            }
+//        }
+//
+//        @Override
+//        public Fragment getItem(int position){
+//            return screen_fragments.get(position);
+//        }
+//
+//        @Override
+//        public int getItemPosition(Object object){
+//            int index = screen_fragments.indexOf(object);
+//
+//            if (index == -1)
+//                return POSITION_NONE;
+//            else
+//                return index;
+//        }
+//
+//        @Override
+//        public int getCount() {
+//            return NUM_PAGES;
+//        }
+//
+//
+//        public void removeAtPosition(int pos){
+//
+//            screen_fragments.remove(pos);
+//        }
+//
+//    }
 
-            for(int i = 0; i < NUM_PAGES; i++)
-            {
 
-                Bundle bundle = new Bundle();
-                bundle.putString("KEY", new Integer(i).toString());
-                ScreenSlidePageFragment fragobj = new ScreenSlidePageFragment();
-                fragobj.setArguments(bundle);
-                screen_fragments.add(fragobj);
-            }
-        }
-
-        @Override
-        public Fragment getItem(int position){
-            return screen_fragments.get(position);
-        }
-
-        @Override
-        public int getItemPosition(Object object){
-            int index = screen_fragments.indexOf(object);
-
-            if (index == -1)
-                return POSITION_NONE;
-            else
-                return index;
-        }
-
-        @Override
-        public int getCount() {
-            return NUM_PAGES;
-        }
-
-
-        public void removeAtPosition(int pos){
-            screen_fragments.remove(pos);
-        }
-
-    }
-
-
-    private void drawPageSelectionIndicators(int mPosition){
-        Log.d("DRAW PAGE SELECTED ", new Integer(mPosition).toString());
-        if(linearLayout!=null) {
-            linearLayout.removeAllViews();
-        }
-        linearLayout= findViewById(R.id.viewPagerCountDots);
-        dots = new ImageView[dotsCount];
-
-        for (int i = 0; i < dotsCount; i++) {
-            dots[i] = new ImageView(MainActivity.this);
-            if(i==mPosition)
-                dots[i].setImageDrawable(getResources().getDrawable(R.drawable.item_selected));
-            else
-                dots[i].setImageDrawable(getResources().getDrawable(R.drawable.item_unselected));
-
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-            );
-
-            params.setMargins(4, 0, 4, 0);
-            linearLayout.addView(dots[i], params);
-        }
-    }
+//    private void drawPageSelectionIndicators(int mPosition){
+//        Log.d("DRAW PAGE SELECTED ", new Integer(mPosition).toString());
+//        if(linearLayout!=null) {
+//            linearLayout.removeAllViews();
+//        }
+//        linearLayout= findViewById(R.id.viewPagerCountDots);
+//        dots = new ImageView[dotsCount];
+//
+//        for (int i = 0; i < dotsCount; i++) {
+//            dots[i] = new ImageView(MainActivity.this);
+//            if(i==mPosition)
+//                dots[i].setImageDrawable(getResources().getDrawable(R.drawable.item_selected));
+//            else
+//                dots[i].setImageDrawable(getResources().getDrawable(R.drawable.item_unselected));
+//
+//            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+//                    LinearLayout.LayoutParams.WRAP_CONTENT,
+//                    LinearLayout.LayoutParams.WRAP_CONTENT
+//            );
+//
+//            params.setMargins(4, 0, 4, 0);
+//            linearLayout.addView(dots[i], params);
+//        }
+//    }
 
     private void makeApiCall(String text) {
         ApiCall.make(this, text, new Response.Listener<JSONArray>() {
@@ -304,16 +310,20 @@ public class MainActivity extends AppCompatActivity {
 
         // Get the search menu.
         MenuItem searchMenu = menu.findItem(R.id.action_search);
-
         // Get SearchView object.
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchMenu);
 
         // Get SearchView autocomplete object.
         final SearchView.SearchAutoComplete searchAutoComplete = (SearchView.SearchAutoComplete)searchView.findViewById(R.id.search_src_text);
-        searchAutoComplete.setBackgroundColor(Color.BLUE);
-        searchAutoComplete.setTextColor(Color.GREEN);
-        searchAutoComplete.setDropDownBackgroundResource(android.R.color.white);
+
+        searchAutoComplete.setBackgroundColor(getResources().getColor(R.color.colorVeryDarkGrey));
+//        searchAutoComplete.setTextColor(Color.WHITE);
+//        searchAutoComplete.setDropDownBackgroundDrawable(getResources().getDrawable(R.drawable.abc_popup_background_mtrl_mult));
+//        searchAutoComplete.setDropDownBackgroundResource(R.drawable.splash_background);
         searchAutoComplete.setThreshold(1);
+
+
+
         searchAutoComplete.setAdapter(autoSuggestAdapter);
 
         searchAutoComplete.setOnItemClickListener(

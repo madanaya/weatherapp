@@ -16,6 +16,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -50,6 +52,7 @@ public class ScreenSlidePageFragment extends Fragment {
      * @param param2 Parameter 2.
      * @return A new instance of fragment ScreenSlidePageFragment.
      */
+
     // TODO: Rename and change types and number of parameters
     public static ScreenSlidePageFragment newInstance(String param1, String param2) {
         ScreenSlidePageFragment fragment = new ScreenSlidePageFragment();
@@ -72,22 +75,33 @@ public class ScreenSlidePageFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         ViewGroup rootView = (ViewGroup) inflater.inflate(
                 R.layout.fragment_screen_slide_page, container, false);
 
         final String strtext = getArguments().getString("KEY");
+        final int position = Integer.parseInt(strtext);
 
+        TextView tv = (TextView)rootView.findViewById(R.id.place_details);
+        //Log.d("Textview Text", tv.getText().toString());
+        tv.setText(tv.getText() + strtext);
 
-        Button deleteButton = (Button) rootView.findViewById(R.id.delete_button);
-        deleteButton.setText("Delete " + strtext);
-        deleteButton.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton fb = rootView.findViewById(R.id.floatingActionButton);
+        fb.setOnClickListener(new View.OnClickListener(){
+
             @Override
             public void onClick(View view) {
                 Log.d("FRAGMENT ", strtext);
                 Log.d("Parent Instance", getActivity().getLocalClassName());
+                MainActivity instance = (MainActivity)getActivity();
+                instance.removeFragment(position);
             }
         });
+
+        if(position == 0){
+            fb.hide();
+        }
 
         CardView card_view = (CardView) rootView.findViewById(R.id.card_view);
         card_view.setOnClickListener(new View.OnClickListener(){
@@ -97,7 +111,6 @@ public class ScreenSlidePageFragment extends Fragment {
                 startActivity(i);
             }
         });
-
 
         return rootView;
     }

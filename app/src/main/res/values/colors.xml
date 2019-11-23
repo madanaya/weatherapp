@@ -6,6 +6,9 @@
     <color name="colorIcon">#B075F4</color>
     <color name="colorWhite">#FFF</color>
     <color name="colorDarkGrey">#999</color>
-    <color name="colorVeryDarkGrey">#333</color>
+    <color name="colorVeryDarkGrey">#222</color>
     <color name="colorVeryMediumGrey">#333</color>
+    <color name="colorBlack">#000</color>
+    <color name="colorOrange">#DF9108</color>
 </resources>
+
