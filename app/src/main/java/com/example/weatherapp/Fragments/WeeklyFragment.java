@@ -75,7 +75,6 @@ public class WeeklyFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
-
     }
 
     @Override
@@ -89,6 +88,7 @@ public class WeeklyFragment extends Fragment {
         LineDataSet lineDataSet2 =  new LineDataSet(dataValues2(), "Temperature Max");
         lineDataSet1.setColor(Color.parseColor("#B075F4"));
         lineDataSet2.setColor(Color.parseColor("#DF9108"));
+
         ArrayList<ILineDataSet> dataSets = new ArrayList<>();
         dataSets.add(lineDataSet1);
         dataSets.add(lineDataSet2);
@@ -117,8 +117,6 @@ public class WeeklyFragment extends Fragment {
 
         chart.getLegend().setCustom(legends);
         legend.setForm(Legend.LegendForm.SQUARE);
-
-
 
 
         chart.setData(data);

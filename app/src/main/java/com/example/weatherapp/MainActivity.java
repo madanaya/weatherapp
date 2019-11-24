@@ -3,15 +3,12 @@ package com.example.weatherapp;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.view.MenuItemCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentStatePagerAdapter;
-import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
@@ -32,16 +29,16 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.weatherapp.models.WeatherData;
 import com.google.android.material.tabs.TabLayout;
+import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -50,13 +47,16 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.weatherapp.Constants.FRAGMENT_LOCATION_KEY;
+import static com.example.weatherapp.Constants.SHARED_PREF_NAME;
+
 
 public class MainActivity extends AppCompatActivity {
     /**
      * The number of pages (wizard steps) to show in this demo.
      */
     private static final int NUM_PAGES = 5;
-
+    public static Context applicationContext;
     /**
      * The pager widget, which handles animation and allows swiping horizontally to access previous
      * and next wizard steps.
@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ProgressBar spinner;
     private SearchView.SearchAutoComplete searchAutoComplete;
-    private ScreenSlidePagerAdapter pagerAdapter;
+    protected static ScreenSlidePagerAdapter pagerAdapter;
     private SearchView searchView;
     private int dotsCount=5;    //No of tabs or images
     private ImageView[] dots;
@@ -87,6 +87,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        applicationContext = getApplicationContext();
+
         getSupportActionBar().show();
         getSupportActionBar().setBackgroundDrawable(
                 new ColorDrawable(Color.parseColor("#000000")));
@@ -96,9 +98,22 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabDots);
         tabLayout.setupWithViewPager(mPager, true);
 
-        // 2) Creating a new pager adapter
-        pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
+        // 4) Autocomplete Setting up the adapter for AutoSuggest
+        autoSuggestAdapter = new AutoSuggestAdapter(this,
+                android.R.layout.simple_dropdown_item_1line);
 
+        // Before Calling Adapter, load current location object and append it to favorites_GSON Of SharedPrefs
+        getLocation();
+
+
+    }
+
+    /*
+        This method will be called after the current location has been fetched
+     */
+    public void createFragments(){
+        // 2) Creating a new pager adapter
+        pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager(),applicationContext);
         mPager.setAdapter(pagerAdapter);
 
         // 3) Set current page and set page change listener
@@ -119,15 +134,7 @@ public class MainActivity extends AppCompatActivity {
             public void onPageScrollStateChanged(int state) {
             }
         });
-
-        // 4) Autocomplete Setting up the adapter for AutoSuggest
-        autoSuggestAdapter = new AutoSuggestAdapter(this,
-                android.R.layout.simple_dropdown_item_1line);
-
-        // 5) Make API Call
-        getLocation();
     }
-
     public void removeFragment(int position){
         pagerAdapter.removeAtPosition(position);
     }
@@ -143,11 +150,13 @@ public class MainActivity extends AppCompatActivity {
 
         String latlon = new Double(latitude).toString() + "," + new Double(longitude).toString();
         String current_location = getCurrentLocationAddress(latlon);
+
     }
 
    public String getCurrentLocationAddress(String latlon){
 
        RequestQueue queue = Volley.newRequestQueue(this);
+
        String url ="https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latlon + "&key=AIzaSyCIdFpOSv3TKDsBv89aLvDWq9gWLgkCL10";
 
        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url,null,
@@ -159,10 +168,13 @@ public class MainActivity extends AppCompatActivity {
                            String parts [] = address.split(" ");
                            StringBuilder req_address = new StringBuilder();
 
+                           int no_parts = parts.length;
+
                            for(int i = 1; i < parts.length; i++){
                                req_address.append(parts[i]);
                            }
 
+                           getCurrentLocationObject(req_address.toString());
                            Log.d("RESPONSE ", req_address.toString());
                        } catch (JSONException e) {
                            e.printStackTrace();
@@ -180,6 +192,61 @@ public class MainActivity extends AppCompatActivity {
        return "abc";
     }
 
+
+    public String getCurrentLocationObject(final String address){
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+        String url = "https://nodeweather.azurewebsites.net/getWeatherAddressString/" + address;
+
+        Log.d("getCurrentLocationObjec", url);
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url,null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response)
+                    {
+
+                        final SharedPreferences sharedprefs = getSharedPreferences(SHARED_PREF_NAME,Context.MODE_PRIVATE);
+                        String storedLocations = sharedprefs.getString(FRAGMENT_LOCATION_KEY,"");
+
+                        String location_key = address + "|";
+
+                        String parts[] = storedLocations.split("\\|");
+                        String newlocations = "";
+
+                        for(int i = 1; i < parts.length; i++)
+                        {
+                            newlocations +=  parts[i] + "|";
+                        }
+
+                        storedLocations = location_key + newlocations;
+                        SharedPreferences.Editor editor = sharedprefs.edit();
+                        editor.putString(FRAGMENT_LOCATION_KEY, storedLocations);
+
+                        // Create new object
+                        WeatherData weatherData = new WeatherData(response);
+                        Gson gson = new Gson();
+                        String json = gson.toJson(weatherData);
+
+                        editor.putString(address,json);
+                        editor.apply();
+
+                        createFragments();
+                        Log.d("Cur_location_object", response.toString());
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //textView.setText("That didn't work!");
+                Log.d("RESPONSE","MESSAGE");
+            }
+        });
+
+        queue.add(jsonRequest);
+        return "abc";
+    }
+
+
+
     @Override
     public void onBackPressed() {
         if (mPager.getCurrentItem() == 0) {
@@ -192,82 +259,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * A simple pager adapter that represents 5 ScreenSlidePageFragment objects, in
-     * sequence.
-     */
-//    public class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
-//
-//        public List<Fragment> screen_fragments = new ArrayList<>();
-//
-//        public ScreenSlidePagerAdapter(FragmentManager fm) {
-//            super(fm);
-//
-//
-//            for(int i = 0; i < NUM_PAGES; i++)
-//            {
-//
-//                Bundle bundle = new Bundle();
-//                bundle.putString("KEY", new Integer(i).toString());
-//                ScreenSlidePageFragment fragobj = new ScreenSlidePageFragment();
-//                fragobj.setArguments(bundle);
-//                screen_fragments.add(fragobj);
-//            }
-//        }
-//
-//        @Override
-//        public Fragment getItem(int position){
-//            return screen_fragments.get(position);
-//        }
-//
-//        @Override
-//        public int getItemPosition(Object object){
-//            int index = screen_fragments.indexOf(object);
-//
-//            if (index == -1)
-//                return POSITION_NONE;
-//            else
-//                return index;
-//        }
-//
-//        @Override
-//        public int getCount() {
-//            return NUM_PAGES;
-//        }
-//
-//
-//        public void removeAtPosition(int pos){
-//
-//            screen_fragments.remove(pos);
-//        }
-//
-//    }
-
-
-//    private void drawPageSelectionIndicators(int mPosition){
-//        Log.d("DRAW PAGE SELECTED ", new Integer(mPosition).toString());
-//        if(linearLayout!=null) {
-//            linearLayout.removeAllViews();
-//        }
-//        linearLayout= findViewById(R.id.viewPagerCountDots);
-//        dots = new ImageView[dotsCount];
-//
-//        for (int i = 0; i < dotsCount; i++) {
-//            dots[i] = new ImageView(MainActivity.this);
-//            if(i==mPosition)
-//                dots[i].setImageDrawable(getResources().getDrawable(R.drawable.item_selected));
-//            else
-//                dots[i].setImageDrawable(getResources().getDrawable(R.drawable.item_unselected));
-//
-//            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-//                    LinearLayout.LayoutParams.WRAP_CONTENT,
-//                    LinearLayout.LayoutParams.WRAP_CONTENT
-//            );
-//
-//            params.setMargins(4, 0, 4, 0);
-//            linearLayout.addView(dots[i], params);
-//        }
-//    }
 
     private void makeApiCall(String text) {
         ApiCall.make(this, text, new Response.Listener<JSONArray>() {
@@ -351,7 +342,7 @@ public class MainActivity extends AppCompatActivity {
                  */
 
                 Intent i = new Intent(MainActivity.this, SearchResultsActivity.class);
-                i.putExtra("SEARCH", true);
+                i.putExtra("SEARCH", queryString);
                 startActivity(i);
 
 

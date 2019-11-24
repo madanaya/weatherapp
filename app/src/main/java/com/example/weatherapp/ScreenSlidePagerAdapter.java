@@ -1,10 +1,14 @@
 package com.example.weatherapp;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
+
+import com.example.weatherapp.utils.SharedPreferenceFunctions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,19 +16,34 @@ import java.util.List;
 public class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
 
     public List<Fragment> screen_fragments = new ArrayList<>();
-    int num_pages = 5;
+    final SharedPreferenceFunctions sharedPreferenceFunctions;
 
-    public ScreenSlidePagerAdapter(FragmentManager fm) {
+    int num_pages;
+
+    public ScreenSlidePagerAdapter(FragmentManager fm, Context context) {
         super(fm);
+        sharedPreferenceFunctions = new SharedPreferenceFunctions(context);
+        createAdapterData();
+    }
 
-        for(int i = 0; i < num_pages; i++)
+    public void createAdapterData(){
+        screen_fragments.clear();
+        String storedLocations = sharedPreferenceFunctions.getSavedLocations();
+        Log.d("CREATEADAPTERDATA", storedLocations);
+        String parts[] = storedLocations.split("\\|");
+        num_pages = parts.length;
+        Log.d("CREATEADAPTERDATA", new Integer(num_pages).toString());
+        for(int i = 0; i < parts.length; i++)
         {
+            Log.d("PART", parts[i]);
             Bundle bundle = new Bundle();
             bundle.putString("KEY", new Integer(i).toString());
+            bundle.putString("LOCATION", parts[i]);
             ScreenSlidePageFragment fragobj = new ScreenSlidePageFragment();
             fragobj.setArguments(bundle);
             screen_fragments.add(fragobj);
         }
+        this.notifyDataSetChanged();
     }
 
     @Override
@@ -44,33 +63,15 @@ public class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public int getCount() {
-        return num_pages;
+        return screen_fragments.size();
     }
 
     public void removeAtPosition(int pos){
-        screen_fragments.remove(pos);
-        num_pages -= 1;
-        screen_fragments.clear();
-
-        for(int i = 0; i < num_pages; i++)
-        {
-            Bundle bundle = new Bundle();
-            bundle.putString("KEY", new Integer(i).toString());
-            ScreenSlidePageFragment fragobj = new ScreenSlidePageFragment();
-            fragobj.setArguments(bundle);
-            screen_fragments.add(fragobj);
-        }
-        this.notifyDataSetChanged();
+        Log.d("BEFORE REMOVE", sharedPreferenceFunctions.getSavedLocations());
+        sharedPreferenceFunctions.removeAtPosition(pos);
+        Log.d("REMOVED ", new Integer(pos).toString());
+        Log.d("AFTER REMOVE", sharedPreferenceFunctions.getSavedLocations());
+        createAdapterData();
     }
 
-    public void addNewFragment(){
-
-        ScreenSlidePageFragment fragobj = new ScreenSlidePageFragment();
-        Bundle bundle = new Bundle();
-        bundle.putString("KEY", new Integer(num_pages).toString());
-        fragobj.setArguments(bundle);
-        screen_fragments.add(fragobj);
-        num_pages += 1;
-        this.notifyDataSetChanged();
-    }
 }

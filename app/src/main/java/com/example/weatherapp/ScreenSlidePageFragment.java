@@ -14,8 +14,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.weatherapp.models.WeatherData;
+import com.example.weatherapp.utils.SharedPreferenceFunctions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 
@@ -33,7 +36,7 @@ public class ScreenSlidePageFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
+    private SharedPreferenceFunctions sharedPreferenceFunctions;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -66,6 +69,7 @@ public class ScreenSlidePageFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sharedPreferenceFunctions = new SharedPreferenceFunctions(getContext());
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -76,16 +80,19 @@ public class ScreenSlidePageFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+
         // Inflate the layout for this fragment
         ViewGroup rootView = (ViewGroup) inflater.inflate(
                 R.layout.fragment_screen_slide_page, container, false);
 
         final String strtext = getArguments().getString("KEY");
+        final String current_address = getArguments().getString("LOCATION");
+
+
         final int position = Integer.parseInt(strtext);
 
         TextView tv = (TextView)rootView.findViewById(R.id.place_details);
-        //Log.d("Textview Text", tv.getText().toString());
-        tv.setText(tv.getText() + strtext);
+        tv.setText(current_address + strtext);
 
         FloatingActionButton fb = rootView.findViewById(R.id.floatingActionButton);
         fb.setOnClickListener(new View.OnClickListener(){
@@ -112,6 +119,30 @@ public class ScreenSlidePageFragment extends Fragment {
             }
         });
 
+
+        WeatherData weatherData = sharedPreferenceFunctions.getWeatherDataObject(current_address);
+
+        ImageView card1_icon = rootView.findViewById(R.id.card1_icon);
+        TextView card1_temperature = rootView.findViewById(R.id.card1_temperature);;
+        TextView card1_summary = rootView.findViewById(R.id.card1_summaruy);
+
+        TextView card2_humidity = rootView.findViewById(R.id.humidity_val);
+        TextView card2_visibility = rootView.findViewById(R.id.visibility_val);
+        TextView card2_windspeed = rootView.findViewById(R.id.windspeed_val);
+        TextView card2_pressure = rootView.findViewById(R.id.gauge_val);
+
+
+        card1_icon.setImageResource(weatherData.getIconId());
+        card1_temperature.setText(weatherData.getTemperature());
+        card1_summary.setText(weatherData.getSummary());
+
+        card2_humidity.setText(weatherData.getHumidity());
+        card2_visibility.setText(weatherData.getVisibility());
+        card2_windspeed.setText(weatherData.getWindspeed());
+        card2_pressure.setText(weatherData.getPressure());
+
+        sharedPreferenceFunctions.printAllData();
+
         return rootView;
     }
 
@@ -125,12 +156,7 @@ public class ScreenSlidePageFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-//        if (context instanceof OnFragmentInteractionListener) {
-//            mListener = (OnFragmentInteractionListener) context;
-//        } else {
-//            throw new RuntimeException(context.toString()
-//                    + " must implement OnFragmentInteractionListener");
-//        }
+
     }
 
     @Override
