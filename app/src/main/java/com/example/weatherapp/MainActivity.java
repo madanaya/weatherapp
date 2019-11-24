@@ -102,6 +102,8 @@ public class MainActivity extends AppCompatActivity {
         autoSuggestAdapter = new AutoSuggestAdapter(this,
                 android.R.layout.simple_dropdown_item_1line);
 
+        linearLayout = findViewById(R.id.progress_indicator);
+        linearLayout.setVisibility(View.VISIBLE);
         // Before Calling Adapter, load current location object and append it to favorites_GSON Of SharedPrefs
         getLocation();
 
@@ -230,6 +232,7 @@ public class MainActivity extends AppCompatActivity {
                         editor.putString(address,json);
                         editor.apply();
 
+                        linearLayout.setVisibility(View.INVISIBLE);
                         createFragments();
                         Log.d("Cur_location_object", response.toString());
                     }

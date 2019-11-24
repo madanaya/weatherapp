@@ -46,7 +46,7 @@
         >
 
         <TextView
-            android:padding="5sp"
+            android:padding="10sp"
             android:text="Search Result"
             android:textSize="18sp"
             android:textColor="@color/colorDarkGrey"

@@ -36,6 +36,7 @@ public class DetailsActivity extends AppCompatActivity {
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
+    private String selectedLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,10 +47,10 @@ public class DetailsActivity extends AppCompatActivity {
                 new ColorDrawable(Color.parseColor("#000000")));
 
 
-        /* Todo 1:
-           Get data from the bundle and display it
-        * */
-        getSupportActionBar().setTitle("Los Angeles, CA, USA");
+        Intent intent = getIntent();
+        selectedLocation = intent.getStringExtra("SELECTED_LOCATION");
+        getSupportActionBar().setTitle(selectedLocation);
+
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         createViewPager(viewPager);
 
@@ -89,12 +90,6 @@ public class DetailsActivity extends AppCompatActivity {
                 }
         );
 
-//        TextView tabOne = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
-//        tabOne.setText("ONE");
-//        tabOne.setCompoundDrawablesWithIntrinsicBounds(0, R.mipmap.analytics, 0, 0);
-//        tabLayout.getTabAt(0).setCustomView(tabOne);
-//        getSupportActionBar().setTitle("Los Angeles, CA, US");
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private void createTabIcons() {
@@ -134,9 +129,24 @@ public class DetailsActivity extends AppCompatActivity {
 
     private void createViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFrag(new TodayFragment(), "Tab 1");
-        adapter.addFrag(new WeeklyFragment(), "Tab 2");
-        adapter.addFrag(new PhotosFragment(), "Tab 3");
+
+        Bundle bundle = new Bundle();
+        bundle.putString("SELECTED_LOCATION", selectedLocation);
+        TodayFragment todayFragment = new TodayFragment();
+        todayFragment.setArguments(bundle);
+        adapter.addFrag(todayFragment, "Tab 1");
+
+        WeeklyFragment weeklyFragment = new WeeklyFragment();
+        weeklyFragment.setArguments(bundle);
+        adapter.addFrag(weeklyFragment, "Tab 2");
+
+        PhotosFragment photosFragment = new PhotosFragment();
+        photosFragment.setArguments(bundle);
+        adapter.addFrag(photosFragment, "Tab 3");
+//        
+//        adapter.addFrag(new TodayFragment(), "Tab 1");
+//        adapter.addFrag(new WeeklyFragment(), "Tab 2");
+//        adapter.addFrag(new PhotosFragment(), "Tab 3");
         viewPager.setAdapter(adapter);
     }
 

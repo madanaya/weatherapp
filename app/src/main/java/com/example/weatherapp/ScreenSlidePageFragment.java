@@ -115,6 +115,7 @@ public class ScreenSlidePageFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(getActivity(), DetailsActivity.class);
+                i.putExtra("SELECTED_LOCATION", current_address);
                 startActivity(i);
             }
         });
@@ -141,9 +142,31 @@ public class ScreenSlidePageFragment extends Fragment {
         card2_windspeed.setText(weatherData.getWindspeed());
         card2_pressure.setText(weatherData.getPressure());
 
+        setTableRowData(rootView, 0, weatherData, R.id.row1_date, R.id.row1_icon, R.id.row1_tempmin, R.id.row1_tempmax);
+        setTableRowData(rootView, 1, weatherData, R.id.row2_date, R.id.row2_icon, R.id.row2_tempmin, R.id.row2_tempmax);
+        setTableRowData(rootView, 2, weatherData, R.id.row3_date, R.id.row3_icon, R.id.row3_tempmin, R.id.row3_tempmax);
+        setTableRowData(rootView, 3, weatherData, R.id.row4_date, R.id.row4_icon, R.id.row4_tempmin, R.id.row4_tempmax);
+        setTableRowData(rootView, 4, weatherData, R.id.row5_date, R.id.row5_icon, R.id.row5_tempmin, R.id.row5_tempmax);
+        setTableRowData(rootView, 5, weatherData, R.id.row6_date, R.id.row6_icon, R.id.row6_tempmin, R.id.row6_tempmax);
+        setTableRowData(rootView, 6, weatherData, R.id.row7_date, R.id.row7_icon, R.id.row7_tempmin, R.id.row7_tempmax);
+        setTableRowData(rootView, 7, weatherData, R.id.row8_date, R.id.row8_icon, R.id.row8_tempmin, R.id.row8_tempmax);
+
         sharedPreferenceFunctions.printAllData();
 
         return rootView;
+    }
+
+    public void setTableRowData(View rootView, int row, WeatherData weatherData, int date_id, int icon_id, int tempmin_id, int tempmax_id)
+    {
+        TextView row_date = rootView.findViewById(date_id);
+        ImageView row_image = rootView.findViewById(icon_id);
+        TextView row_temperature_min = rootView.findViewById(tempmin_id);
+        TextView row_temperature_max = rootView.findViewById(tempmax_id);
+
+        row_date.setText(weatherData.getDailyData(row).getTimestamp());
+        row_image.setImageResource(weatherData.getDailyData(row).getIcon());
+        row_temperature_min.setText(weatherData.getDailyData(row).getTemperatureMin());
+        row_temperature_max.setText(weatherData.getDailyData(row).getTemperatureMax());
     }
 
     // TODO: Rename method, update argument and hook method into UI event
