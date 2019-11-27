@@ -87,12 +87,10 @@ public class ScreenSlidePageFragment extends Fragment {
 
         final String strtext = getArguments().getString("KEY");
         final String current_address = getArguments().getString("LOCATION");
-
-
         final int position = Integer.parseInt(strtext);
 
         TextView tv = (TextView)rootView.findViewById(R.id.place_details);
-        tv.setText(current_address + strtext);
+        tv.setText(current_address);
 
         FloatingActionButton fb = rootView.findViewById(R.id.floatingActionButton);
         fb.setOnClickListener(new View.OnClickListener(){
@@ -125,7 +123,7 @@ public class ScreenSlidePageFragment extends Fragment {
 
         ImageView card1_icon = rootView.findViewById(R.id.card1_icon);
         TextView card1_temperature = rootView.findViewById(R.id.card1_temperature);;
-        TextView card1_summary = rootView.findViewById(R.id.card1_summaruy);
+        TextView card1_summary = rootView.findViewById(R.id.card1_summary);
 
         TextView card2_humidity = rootView.findViewById(R.id.humidity_val);
         TextView card2_visibility = rootView.findViewById(R.id.visibility_val);
@@ -151,7 +149,7 @@ public class ScreenSlidePageFragment extends Fragment {
         setTableRowData(rootView, 6, weatherData, R.id.row7_date, R.id.row7_icon, R.id.row7_tempmin, R.id.row7_tempmax);
         setTableRowData(rootView, 7, weatherData, R.id.row8_date, R.id.row8_icon, R.id.row8_tempmin, R.id.row8_tempmax);
 
-        sharedPreferenceFunctions.printAllData();
+        //sharedPreferenceFunctions.printAllData();
 
         return rootView;
     }

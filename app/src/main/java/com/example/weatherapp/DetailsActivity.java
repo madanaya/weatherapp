@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -25,6 +26,9 @@ import android.widget.TextView;
 import com.example.weatherapp.Fragments.PhotosFragment;
 import com.example.weatherapp.Fragments.TodayFragment;
 import com.example.weatherapp.Fragments.WeeklyFragment;
+import com.example.weatherapp.models.WeatherData;
+import com.example.weatherapp.utils.SharedPreferenceFunctions;
+import com.example.weatherapp.utils.SharingUtils;
 import com.google.android.material.tabs.TabLayout;
 
 import org.w3c.dom.Text;
@@ -37,6 +41,8 @@ public class DetailsActivity extends AppCompatActivity {
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private String selectedLocation;
+    private SharedPreferenceFunctions sharedPreferenceFunctions;
+    private WeatherData weatherData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +56,9 @@ public class DetailsActivity extends AppCompatActivity {
         Intent intent = getIntent();
         selectedLocation = intent.getStringExtra("SELECTED_LOCATION");
         getSupportActionBar().setTitle(selectedLocation);
+
+        sharedPreferenceFunctions = new SharedPreferenceFunctions(getApplicationContext());
+        weatherData = sharedPreferenceFunctions.getWeatherDataObject(selectedLocation);
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         createViewPager(viewPager);
@@ -92,8 +101,8 @@ public class DetailsActivity extends AppCompatActivity {
 
     }
 
-    private void createTabIcons() {
-
+    private void createTabIcons()
+    {
         View tabOne = LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
         ImageView imgView = tabOne.findViewById(R.id.icon_tab);
         imgView.setImageResource(R.drawable.calendar_today);
@@ -103,18 +112,14 @@ public class DetailsActivity extends AppCompatActivity {
         tabTv.setTextColor(getResources().getColor(R.color.colorWhite));
         tabLayout.getTabAt(0).setCustomView(tabOne);
 
-
         View tabTwo = LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
         ImageView imgView2 = tabTwo.findViewById(R.id.icon_tab);
         imgView2.setImageResource(R.drawable.trending_up);
         imgView2.setColorFilter(getResources().getColor(R.color.colorDarkGrey));
 
-
         TextView tabTv2 = tabTwo.findViewById(R.id.text_tab);
         tabTv2.setText("WEEKLY");
-
         tabLayout.getTabAt(1).setCustomView(tabTwo);
-
 
         View tabThree = LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
         ImageView imgView3 = tabThree.findViewById(R.id.icon_tab);
@@ -178,6 +183,28 @@ public class DetailsActivity extends AppCompatActivity {
             return mFragmentTitleList.get(position);
         }
     }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.search_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_twitter)
+        {
+            String parts[] = selectedLocation.split(",");
+
+            String message = "Check Out " + parts[0] + "’s Weather! It is " + weatherData.getFormattedTemperature()  +"°F! #CSCI571WeatherSearch";
+            SharingUtils.shareTwitter(this, message);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
 
     @Override
     public boolean onSupportNavigateUp(){

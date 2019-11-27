@@ -1,6 +1,8 @@
 package com.example.weatherapp;
 
+import android.content.Context;
 import android.media.Image;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -8,6 +10,8 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -20,6 +24,7 @@ import com.squareup.picasso.Picasso;
 
 public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.MyViewHolder> {
     private String[] mDataset;
+    private Context mContext;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -28,6 +33,7 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.MyViewHold
     public static class MyViewHolder extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
         public ImageView imageView;
+
         public MyViewHolder(ImageView v) {
             super(v);
             imageView = v;
@@ -35,8 +41,9 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.MyViewHold
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public PhotosAdapter(String[] myDataset) {
+    public PhotosAdapter(String[] myDataset, Context myContext) {
         mDataset = myDataset;
+        mContext = myContext;
     }
 
     // Create new views (invoked by the layout manager)
@@ -53,21 +60,32 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.MyViewHold
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
 
-        Picasso.get()
-                .load(mDataset[position])
-                .resize(1400, 800).centerCrop()
-                .into(holder.imageView, new Callback() {
-                    @Override
-                    public void onSuccess() {
-                    }
+        RequestOptions options = new RequestOptions()
+                .centerCrop()
+                .error(R.mipmap.ic_launcher_round)
+                .override(1400,800);
 
-                    @Override
-                    public void onError(Exception e) {
-                        e.printStackTrace();
-                    }
-                });
-        //Picasso.get().load(R.drawable.eye).into(holder.imageView);
-        //holder.imageView.setImageResource(R.drawable.ic_eye_black_48dp);
+
+        Log.d("Dataset at position", mDataset[position]);
+        Glide.with(mContext).load(mDataset[position]).apply(options).into(holder.imageView);
+
+
+//        Picasso.get()
+//                .load(mDataset[position])
+//                .resize(1400, 800).centerCrop()
+//                .into(holder.imageView, new Callback() {
+//                    @Override
+//                    public void onSuccess() {
+//                    }
+//
+//                    @Override
+//                    public void onError(Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                });
+//
+//        Picasso.get().load(R.drawable.eye).into(holder.imageView);
+//        holder.imageView.setImageResource(R.drawable.ic_eye_black_48dp);
 
     }
 

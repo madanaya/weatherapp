@@ -107,7 +107,6 @@ public class MainActivity extends AppCompatActivity {
         // Before Calling Adapter, load current location object and append it to favorites_GSON Of SharedPrefs
         getLocation();
 
-
     }
 
     /*
@@ -308,12 +307,9 @@ public class MainActivity extends AppCompatActivity {
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchMenu);
 
         // Get SearchView autocomplete object.
-        final SearchView.SearchAutoComplete searchAutoComplete = (SearchView.SearchAutoComplete)searchView.findViewById(R.id.search_src_text);
+        searchAutoComplete = (SearchView.SearchAutoComplete)searchView.findViewById(R.id.search_src_text);
 
         searchAutoComplete.setBackgroundColor(getResources().getColor(R.color.colorVeryDarkGrey));
-//        searchAutoComplete.setTextColor(Color.WHITE);
-//        searchAutoComplete.setDropDownBackgroundDrawable(getResources().getDrawable(R.drawable.abc_popup_background_mtrl_mult));
-//        searchAutoComplete.setDropDownBackgroundResource(R.drawable.splash_background);
         searchAutoComplete.setThreshold(1);
 
 
@@ -328,6 +324,7 @@ public class MainActivity extends AppCompatActivity {
 
                         Log.d("Item Click", autoSuggestAdapter.getObject(position));
                         searchAutoComplete.setText(autoSuggestAdapter.getObject(position));
+
                     }
                 });
 

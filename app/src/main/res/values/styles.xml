@@ -18,8 +18,14 @@
 
     <style name="AppTheme.Launcher" parent ="Theme.AppCompat">
         <item name="android:windowBackground">@drawable/splash_background</item>
-        <!--<item name="autoCompleteTextViewStyle">@style/myAutoCompleteTextViewStyle</item>-->
-        <!--<item name="textAppearanceSearchResultTitle">@style/mySearchResult</item>-->
     </style>
 
+    <style name="SelectableItemTheme">
+        <item name="colorControlHighlight">@color/colorAccent</item>
+    </style>
+
+    <style name="SelectableItemBackground">
+        <item name="android:theme">@style/SelectableItemTheme</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+    </style>
 </resources>

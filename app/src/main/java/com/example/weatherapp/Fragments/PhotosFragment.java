@@ -13,8 +13,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.weatherapp.PhotosAdapter;
 import com.example.weatherapp.R;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -92,20 +102,21 @@ public class PhotosFragment extends Fragment {
 
         // specify an adapter (see also next example)
 
-        String[] myDataset = {
-                "https://theculturetrip.com/wp-content/uploads/2018/10/g7dag5.jpg",
-                "https://consumerenergyalliance.org/cms/wp-content/uploads/2018/10/california-capitola.jpg",
-                "https://theculturetrip.com/wp-content/uploads/2018/10/g7dag5.jpg",
-                "https://consumerenergyalliance.org/cms/wp-content/uploads/2018/10/california-capitola.jpg",
-                "https://theculturetrip.com/wp-content/uploads/2018/10/g7dag5.jpg",
-                "https://consumerenergyalliance.org/cms/wp-content/uploads/2018/10/california-capitola.jpg",
-                "https://theculturetrip.com/wp-content/uploads/2018/10/g7dag5.jpg",
-                "https://consumerenergyalliance.org/cms/wp-content/uploads/2018/10/california-capitola.jpg",
-        };
-
-
-        mAdapter = new PhotosAdapter(myDataset);
-        recyclerView.setAdapter(mAdapter);
+//        String[] myDataset = {
+//                "https://theculturetrip.com/wp-content/uploads/2018/10/g7dag5.jpg",
+//                "https://consumerenergyalliance.org/cms/wp-content/uploads/2018/10/california-capitola.jpg",
+//                "https://theculturetrip.com/wp-content/uploads/2018/10/g7dag5.jpg",
+//                "https://consumerenergyalliance.org/cms/wp-content/uploads/2018/10/california-capitola.jpg",
+//                "https://theculturetrip.com/wp-content/uploads/2018/10/g7dag5.jpg",
+//                "https://consumerenergyalliance.org/cms/wp-content/uploads/2018/10/california-capitola.jpg",
+//                "https://theculturetrip.com/wp-content/uploads/2018/10/g7dag5.jpg",
+//                "https://consumerenergyalliance.org/cms/wp-content/uploads/2018/10/california-capitola.jpg",
+//        };
+//
+//
+//        mAdapter = new PhotosAdapter(myDataset);
+//        recyclerView.setAdapter(mAdapter);
+        setPhotos(selected_address);
         return view;
     }
 
@@ -146,5 +157,67 @@ public class PhotosFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+
+    public void setPhotos(String address)
+    {
+        String url = "https://www.googleapis.com/customsearch/v1?q=" + address + "&cx=012110676718765995432:tn1arlbxw37&imgSize=huge&imgType=news&num=10&searchType=image&key=AIzaSyBAY4Pax3D-dg33_HKYnXpbiOus5KrknZA";
+        RequestQueue queue = Volley.newRequestQueue(getActivity());
+        Log.d("PhotosFragment", url);
+
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url,null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response)
+                    {
+                        try {
+
+//                            String [] dataset = new String[8];
+//
+//                            JSONArray items = response.getJSONArray("items");
+//                            for(int i = 0; i < items.length(); i++){
+//                                dataset[i] = items.getJSONObject(i).getString("link");
+//
+//                            }
+//
+//                            mAdapter = new PhotosAdapter(dataset, getContext());
+//                            recyclerView.setAdapter(mAdapter);
+
+                            String [] dataset = new String[8];
+                            int data_index = 0;
+                            int item_index = 0;
+
+                            JSONArray items = response.getJSONArray("items");
+                            while(item_index < 15 && data_index < 8){
+
+                                dataset[data_index] = items.getJSONObject(item_index).getString("link");
+                                if( !dataset[data_index].endsWith(".svg")){
+                                    data_index += 1;
+                                }
+                                item_index += 1;
+                            }
+//                            for(int i = 0; i < items.length(); i++){
+//                                dataset[i] = items.getJSONObject(i).getString("link");
+//
+//                            }
+
+                            mAdapter = new PhotosAdapter(dataset, getContext());
+                            recyclerView.setAdapter(mAdapter);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //textView.setText("That didn't work!");
+                Log.d("RESPONSE","MESSAGE");
+            }
+        });
+
+        queue.add(jsonRequest);
+
     }
 }

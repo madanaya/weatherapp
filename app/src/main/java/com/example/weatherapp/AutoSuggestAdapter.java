@@ -1,9 +1,14 @@
 package com.example.weatherapp;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,6 +28,7 @@ public class AutoSuggestAdapter extends ArrayAdapter<String> implements Filterab
         mlistData.clear();
         mlistData.addAll(list);
     }
+
     @Override
     public int getCount() {
         return mlistData.size();
@@ -45,7 +51,9 @@ public class AutoSuggestAdapter extends ArrayAdapter<String> implements Filterab
     @NonNull
     @Override
     public Filter getFilter() {
-        Filter dataFilter = new Filter() {
+        Filter dataFilter = new Filter()
+        {
+
             @Override
             protected FilterResults performFiltering(CharSequence constraint) {
                 FilterResults filterResults = new FilterResults();
@@ -55,6 +63,7 @@ public class AutoSuggestAdapter extends ArrayAdapter<String> implements Filterab
                 }
                 return filterResults;
             }
+
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
                 if (results != null && (results.count > 0)) {
@@ -65,5 +74,18 @@ public class AutoSuggestAdapter extends ArrayAdapter<String> implements Filterab
             }
         };
         return dataFilter;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+
+        TextView view = new TextView(getContext());
+        view.setBackgroundColor(Color.WHITE);
+        view.setText(mlistData.get(position));
+        view.setTextColor(Color.BLACK);
+        view.setTextSize(16);
+        view.setPadding(20,65,10,65);
+        return view;
+        //return super.getView(position, convertView, parent);
     }
 }

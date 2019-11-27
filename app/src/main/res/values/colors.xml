@@ -7,6 +7,7 @@
     <color name="colorWhite">#FFF</color>
     <color name="colorDarkGrey">#999</color>
     <color name="colorVeryDarkGrey">#222</color>
+    <color name="colorVeryVeryDarkGrey">#111</color>
     <color name="colorVeryMediumGrey">#333</color>
     <color name="colorBlack">#000</color>
     <color name="colorOrange">#DF9108</color>

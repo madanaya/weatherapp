@@ -4,19 +4,15 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class DailyRow {
-    String timestamp, temperatureMin, temperatureMax;
+    String timestamp;
+    Double temperatureMin, temperatureMax;
     int icon;
 
     public DailyRow(String timestamp, String temperatureMax, String temperatureMin, int icon)
     {
         this.timestamp = formatDate(timestamp);
-
-        Double temperature = Double.parseDouble(temperatureMax);
-        this.temperatureMax = String.format ("%.2f", temperature);;
-
-        temperature = Double.parseDouble(temperatureMin);
-        this.temperatureMin = String.format ("%.2f", temperature);;
-
+        this.temperatureMax = Double.parseDouble(temperatureMax);
+        this.temperatureMin =  Double.parseDouble(temperatureMin);
         this.icon = icon;
     }
 
@@ -37,11 +33,19 @@ public class DailyRow {
     }
 
     public String getTemperatureMin() {
-        return temperatureMin;
+        return String.format ("%.0f", temperatureMin);
+    }
+
+    public Double getTemperatureMinActual(){
+        return this.temperatureMin;
+    }
+
+    public Double getTemperatureMaxActual(){
+        return this.temperatureMax;
     }
 
     public String getTemperatureMax() {
-        return temperatureMax;
+        return String.format ("%.0f", temperatureMax);
     }
 
     public int getIcon() {

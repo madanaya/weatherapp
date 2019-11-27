@@ -10,8 +10,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.example.weatherapp.R;
+import com.example.weatherapp.models.WeatherData;
+import com.example.weatherapp.utils.SharedPreferenceFunctions;
+
+import org.w3c.dom.Text;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -31,7 +37,8 @@ public class TodayFragment extends Fragment {
     private String mParam1;
     private String mParam2;
     private String selected_address;
-
+    private SharedPreferenceFunctions sharedPreferenceFunctions;
+    private WeatherData weatherData;
     private OnFragmentInteractionListener mListener;
 
     public TodayFragment() {
@@ -57,12 +64,16 @@ public class TodayFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
+        if (getArguments() != null)
+        {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
             selected_address = getArguments().getString("SELECTED_LOCATION");
+            sharedPreferenceFunctions = new SharedPreferenceFunctions(getContext());
+            weatherData = sharedPreferenceFunctions.getWeatherDataObject(selected_address);
         }
     }
 
@@ -70,7 +81,31 @@ public class TodayFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_today, container, false);
+        View view = inflater.inflate(R.layout.fragment_today, container, false);
+
+        TextView windspeed = view.findViewById(R.id.today_windspeed_val);
+        TextView precipitation = view.findViewById(R.id.today_precipitation_val);
+        TextView pressure = view.findViewById(R.id.today_pressure_val);
+        TextView temperature = view.findViewById(R.id.today_temperature_val);
+        TextView summary = view.findViewById(R.id.today_summary);
+        TextView humidity = view.findViewById(R.id.today_humidity_val);
+        TextView visibility = view.findViewById(R.id.today_visibility_val);
+        TextView cloudclover = view.findViewById(R.id.today_cloudcover_val);
+        TextView ozone = view.findViewById(R.id.today_ozone_val);
+        ImageView imageView = view.findViewById(R.id.today_icon);
+
+        windspeed.setText(weatherData.getWindspeed());
+        precipitation.setText(weatherData.getPrecipitation());
+        pressure.setText(weatherData.getPressure());
+        temperature.setText((weatherData.getTemperature()));
+        summary.setText(weatherData.getSummary());
+        humidity.setText(weatherData.getHumidity());
+        visibility.setText(weatherData.getVisibility());
+        cloudclover.setText(weatherData.getCloudCover());
+        ozone.setText(weatherData.getOzone());
+
+        imageView.setImageResource(weatherData.getIconId());
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event

@@ -10,9 +10,13 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.example.weatherapp.R;
+import com.example.weatherapp.models.WeatherData;
+import com.example.weatherapp.utils.SharedPreferenceFunctions;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.LegendEntry;
@@ -43,6 +47,8 @@ public class WeeklyFragment extends Fragment {
     private String mParam1;
     private String mParam2;
     private String selected_address;
+    private SharedPreferenceFunctions sharedPreferenceFunctions;
+    private WeatherData weatherData;
 
     private OnFragmentInteractionListener mListener;
 
@@ -75,13 +81,15 @@ public class WeeklyFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
             selected_address = getArguments().getString("SELECTED_LOCATION");
+            sharedPreferenceFunctions = new SharedPreferenceFunctions(getContext());
+            weatherData = sharedPreferenceFunctions.getWeatherDataObject(selected_address);
         }
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_weekly, container, false);
 
@@ -125,40 +133,40 @@ public class WeeklyFragment extends Fragment {
         chart.invalidate();
 
 
+        TextView weeklyTextview = view.findViewById(R.id.weekly_summary);
+        weeklyTextview.setText(weatherData.getWeekly_card_summary());
+
+        ImageView weeklyIcon = view.findViewById(R.id.weekly_icon);
+        weeklyIcon.setImageResource(weatherData.getDaily_icon());
+
+        if(weatherData.getDaily_icon() != R.drawable.weather_sunny){
+            weeklyIcon.setColorFilter(getResources().getColor(R.color.colorWhite));
+        }
         return view;
     }
 
 
     public ArrayList<Entry> dataValues1(){
         ArrayList<Entry> dataVals = new ArrayList<>();
+        ArrayList<Double> dailyMins = weatherData.getDailyTemperatureMin();
 
-        dataVals.add(new Entry(0,20));
-        dataVals.add(new Entry(1,30));
-        dataVals.add(new Entry(2,40));
-        dataVals.add(new Entry(3,50));
-        dataVals.add(new Entry(4,60));
-        dataVals.add(new Entry(5,70));
-        dataVals.add(new Entry(6,80));
-        dataVals.add(new Entry(7,90));
+        for(int i = 0; i < dailyMins.size(); i++){
+            dataVals.add(new Entry((float)i, dailyMins.get(i).floatValue()));
+        }
 
         return dataVals;
     }
 
     public ArrayList<Entry> dataValues2(){
         ArrayList<Entry> dataVals = new ArrayList<>();
+        ArrayList<Double> dailyMaxs = weatherData.getDailyTemperatureMax();
 
-        dataVals.add(new Entry(0,10));
-        dataVals.add(new Entry(1,50));
-        dataVals.add(new Entry(2,20));
-        dataVals.add(new Entry(3,30));
-        dataVals.add(new Entry(4,90));
-        dataVals.add(new Entry(5,20));
-        dataVals.add(new Entry(6,70));
-        dataVals.add(new Entry(7,80));
+        for(int i = 0; i < dailyMaxs.size(); i++){
+            dataVals.add(new Entry((float)i, dailyMaxs.get(i).floatValue()));
+        }
 
         return dataVals;
     }
-
 
 
     // TODO: Rename method, update argument and hook method into UI event

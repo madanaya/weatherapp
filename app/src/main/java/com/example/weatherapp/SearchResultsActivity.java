@@ -9,7 +9,10 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,6 +37,8 @@ public class SearchResultsActivity extends AppCompatActivity {
     private LinearLayout progressBar;
     private LinearLayout linearLayout;
     private SharedPreferenceFunctions sharedPreferenceFunctions;
+    private String address;
+    private WeatherData weatherData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,14 +51,14 @@ public class SearchResultsActivity extends AppCompatActivity {
         sharedPreferenceFunctions = new SharedPreferenceFunctions(getApplicationContext());
 
         Intent intent = getIntent();
-        String address = intent.getStringExtra("SEARCH");
+        address = intent.getStringExtra("SEARCH");
         if(address == null || address.length() == 0){
             address = "Los Angeles, LA, USA";
         }
-
         // Creating final instance to be accessed by inner class
         final String current_address = address;
         String title = address;
+        getSupportActionBar().setTitle(title);
 
         isAdded = sharedPreferenceFunctions.checkCityExists(current_address);
         final FloatingActionButton fb = findViewById(R.id.floatingActionButton);
@@ -105,6 +110,7 @@ public class SearchResultsActivity extends AppCompatActivity {
         }
         else{
             fb.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.map_marker_minus));
+            weatherData = sharedPreferenceFunctions.getWeatherDataObject(address);
             mapData(current_address);
         }
     }
@@ -127,13 +133,13 @@ public class SearchResultsActivity extends AppCompatActivity {
 
                         Log.d("SearchActivityResponse", response.toString());
                         sharedPreferenceFunctions.addCityInstance(address,response);
+                        weatherData = sharedPreferenceFunctions.getWeatherDataObject(address);
                         mapData(address);
 
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                //textView.setText("That didn't work!");
                 Log.d("RESPONSE","MESSAGE");
             }
         });
@@ -141,23 +147,64 @@ public class SearchResultsActivity extends AppCompatActivity {
         queue.add(jsonRequest);
     }
 
-    private void mapData(String address){
+    private void mapData(final String address){
         progressBar.setVisibility(View.INVISIBLE);
         linearLayout.setVisibility(View.VISIBLE);
-        WeatherData weatherDataObject = sharedPreferenceFunctions.getWeatherDataObject(address);
-        Log.d("SearchActivityTemp",weatherDataObject.getTemperature());
-
+//        Log.d("SearchActivityTemp",weatherDataObject.getTemperature());
         TextView tv = findViewById(R.id.place_details);
+        tv.setText(address);
 
         CardView card_view = findViewById(R.id.card_view);
         card_view.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(SearchResultsActivity.this, DetailsActivity.class);
-                // Pass location key
+                intent.putExtra("SELECTED_LOCATION", address);
                 startActivity(intent);
             }
         });
+
+
+
+        ImageView card1_icon = findViewById(R.id.card1_icon);
+        TextView card1_temperature = findViewById(R.id.card1_temperature);;
+        TextView card1_summary = findViewById(R.id.card1_summary);
+
+        TextView card2_humidity = findViewById(R.id.humidity_val);
+        TextView card2_visibility = findViewById(R.id.visibility_val);
+        TextView card2_windspeed = findViewById(R.id.windspeed_val);
+        TextView card2_pressure = findViewById(R.id.gauge_val);
+
+        card1_icon.setImageResource(weatherData.getIconId());
+        card1_temperature.setText(weatherData.getTemperature());
+        card1_summary.setText(weatherData.getSummary());
+
+        card2_humidity.setText(weatherData.getHumidity());
+        card2_visibility.setText(weatherData.getVisibility());
+        card2_windspeed.setText(weatherData.getWindspeed());
+        card2_pressure.setText(weatherData.getPressure());
+
+        setTableRowData(0, weatherData, R.id.row1_date, R.id.row1_icon, R.id.row1_tempmin, R.id.row1_tempmax);
+        setTableRowData(1, weatherData, R.id.row2_date, R.id.row2_icon, R.id.row2_tempmin, R.id.row2_tempmax);
+        setTableRowData( 2, weatherData, R.id.row3_date, R.id.row3_icon, R.id.row3_tempmin, R.id.row3_tempmax);
+        setTableRowData( 3, weatherData, R.id.row4_date, R.id.row4_icon, R.id.row4_tempmin, R.id.row4_tempmax);
+        setTableRowData( 4, weatherData, R.id.row5_date, R.id.row5_icon, R.id.row5_tempmin, R.id.row5_tempmax);
+        setTableRowData( 5, weatherData, R.id.row6_date, R.id.row6_icon, R.id.row6_tempmin, R.id.row6_tempmax);
+        setTableRowData( 6, weatherData, R.id.row7_date, R.id.row7_icon, R.id.row7_tempmin, R.id.row7_tempmax);
+        setTableRowData( 7, weatherData, R.id.row8_date, R.id.row8_icon, R.id.row8_tempmin, R.id.row8_tempmax);
+    }
+
+    public void setTableRowData(int row, WeatherData weatherData, int date_id, int icon_id, int tempmin_id, int tempmax_id)
+    {
+        TextView row_date = findViewById(date_id);
+        ImageView row_image = findViewById(icon_id);
+        TextView row_temperature_min = findViewById(tempmin_id);
+        TextView row_temperature_max = findViewById(tempmax_id);
+
+        row_date.setText(weatherData.getDailyData(row).getTimestamp());
+        row_image.setImageResource(weatherData.getDailyData(row).getIcon());
+        row_temperature_min.setText(weatherData.getDailyData(row).getTemperatureMin());
+        row_temperature_max.setText(weatherData.getDailyData(row).getTemperatureMax());
     }
 
     @Override
